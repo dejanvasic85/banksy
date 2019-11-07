@@ -9,7 +9,6 @@ const pause = async (pauseMs) => {
   });
 }
 
-
 // (async function() {
 //   let driver;
 //   const capabilities = Capabilities.chrome();
@@ -28,17 +27,35 @@ const pause = async (pauseMs) => {
 // })();
 
 
-const reconcileAccount = (accountName) => {
-  const accountPage = new AccountPage();
-
-  while(true) {
-
-  }
-
-  accountPage.getNextTransaction();
+const ynab = (ynabKey) => {
+  return {
+    getTransactions: () => {
+      return [{
+        date: '2019/11/06',
+        memo: 'Myki',
+        payee: 'Myki',
+        amount: 50
+      }, {
+        date: '2019/11/06',
+        memo: 'Foxtel',
+        payee: 'Foxtel',
+        amount: 39
+      }]
+    },
+    createTransaction = (txn) => {
+      // Todo 
+    }
+  };
 }
 
+const reconcileAccount = ({ynabKey}) => {
+  const ynabAccount = ynab(ynabKey);
+  ynabAccount.getTransactions();
 
+  const accountPage = new AccountPage();
+  accountPage.getNextTransaction();
+ 
+}
 
 class AccountPage {
 
@@ -48,6 +65,7 @@ class AccountPage {
 
   getNextTransaction() {
     return {
+      date: '',
       description: "something",
       amount: 199
     }
