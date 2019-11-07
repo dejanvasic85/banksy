@@ -1,0 +1,12 @@
+[
+  {
+    "name": "Dejan",
+    "ynab": "dejan-ynab",
+    "institutes": [
+      {
+        "name": "commbank",
+        "secret": "dejan-cba"
+      }
+    ]
+  }
+]
