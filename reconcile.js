@@ -44,20 +44,40 @@ module.exports.getMissingTransactions = ({ ynabTransactions, bankAccount }) => {
   const newTransactions = [];
   const accountTxn = bankAccount.getNextTransaction();
   const t = ynabTransactions.find(ynabTxn => areEqual(ynabTxn, accountTxn));
-  
+
   if (!t) {
     console.log('not here, adding', accountTxn);
     newTransactions.push(accountTxn);
-  } 
+  }
 
-  return newTransactions;  
+  return newTransactions;
 }
+
+module.exports.accountIterator = (ynabTransactions, bankAccount) => {
+  return {
+    [Symbol.iterator]() {
+      return {
+        next() {
+          const nextTransaction = bankAccount.getNextTransaction();
+          const t = ynabTransactions.find(ynabTxn => areEqual(ynabTxn, nextTransaction));
+          if (!t) {
+            return { done: false, value: nextTransaction };
+          } else {
+            return { done: true };
+          }
+        }
+      }
+    }
+  };
+}
+
+
 
 module.exports.reconcile = ({ ynabAccount, bankAccount }) => {
   const param = {
     ynabTransactions: ynabAccount.getTransactions(),
     bankAccount
   }
-  
+
   return this.getMissingTransactions(param);
 };
