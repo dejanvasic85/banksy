@@ -21,10 +21,10 @@ describe('reconcile', () => {
     for (const t of accountIterator(ynabTxns, bankAccount)) {
       data.push(t);
     }
-
-    expect(data).to.eql([{
-      description: 'youtube', amount: 200, date: '2019/11/08',
-      description: 'breakfast', amount: 20, date: '2019/11/08'
-    }]);
+    
+    expect(data).to.eql([
+      { description: 'youtube', amount: 200, date: '2019/11/08' },
+      { description: 'breakfast', amount: 20, date: '2019/11/08' }
+    ]);
   });
 }); 
