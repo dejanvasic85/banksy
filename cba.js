@@ -1,0 +1,39 @@
+const { decrypt } = require('./encrypt');
+
+const cbaCredentialReader = (key) => {
+  const [memberNumber, password] = decrypt(key).split('|');
+  return {
+    memberNumber,
+    password
+  };
+}
+
+const cbaAccountReader = () => {
+  const getNextTransaction = async () => {
+    // Todo - use selenium to get the full details of the transaction
+  }
+
+  return {
+    getNextTransaction
+  };
+}
+
+const cbaCrawler = (credentials) => {
+  const { memberNumber, password } = cbaCredentialReader(credentials);
+ 
+  return {
+    login: async () => {
+      // Todo - use selenium to login
+    },
+    getAccountReader: async (accountName) => {
+      // Todo - use selenium to fetch the account page
+      return cbaAccountReader(accountName);
+    }
+  }
+}
+
+module.exports = {
+  cbaCredentialReader,
+  cbaAccountReader,
+  cbaCrawler
+}
