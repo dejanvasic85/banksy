@@ -2,7 +2,7 @@ const { accountReconciler } = require('./accountReconciler');
 const { expect } = require('chai');
 const sinon = require('sinon');
 
-describe('reconcile', () => {
+describe('accountReconciler', () => {
 
   it('should return new transactions not found in ynab', () => {
     const ynabTxns = [
