@@ -6,21 +6,25 @@ const cbaCredentialReader = (key) => {
     memberNumber,
     password
   };
-}
+};
 
 const cbaAccountReader = () => {
   const getNextTransaction = async () => {
     // Todo - use selenium to get the full details of the transaction
   }
 
+  const openAccount = async () => {
+    // Todo - use selenium to open the account page
+  }
+
   return {
     getNextTransaction
   };
-}
+};
 
 const cbaCrawler = (credentials) => {
   const { memberNumber, password } = cbaCredentialReader(credentials);
- 
+
   return {
     login: async () => {
       // Todo - use selenium to login
@@ -29,11 +33,11 @@ const cbaCrawler = (credentials) => {
       // Todo - use selenium to fetch the account page
       return cbaAccountReader(accountName);
     }
-  }
-}
+  };
+};
 
 module.exports = {
   cbaCredentialReader,
   cbaAccountReader,
   cbaCrawler
-}
+};
