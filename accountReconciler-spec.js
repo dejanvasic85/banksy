@@ -5,7 +5,7 @@ const sinon = require('sinon');
 describe('accountReconciler', () => {
 
   it('should return new transactions not found in ynab', () => {
-    const ynabTxns = [
+    const knownTxns = [
       { description: 'spotify', amount: 100, date: '2019/11/08' },
       { description: 'airbnb', amount: 150, date: '2019/11/08' }
     ];
@@ -18,7 +18,7 @@ describe('accountReconciler', () => {
     };
 
     const data = [];
-    for (const t of accountReconciler(ynabTxns, bankAccount)) {
+    for (const t of accountReconciler(knownTxns, bankAccount)) {
       data.push(t);
     }
 
@@ -29,7 +29,7 @@ describe('accountReconciler', () => {
   });
 
   it('should return nothing empty array if first transaction is in ynab', () => {
-    const ynabTxns = [
+    const knownTxns = [
       { description: 'spotify', amount: 200, date: '2019/11/08' }
     ];
 
@@ -40,7 +40,7 @@ describe('accountReconciler', () => {
     };
 
     const data = [];
-    for (const t of accountReconciler(ynabTxns, bankAccount)) {
+    for (const t of accountReconciler(knownTxns, bankAccount)) {
       data.push(t);
     }
 

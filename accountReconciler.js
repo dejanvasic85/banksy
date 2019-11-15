@@ -1,16 +1,16 @@
-const areEqual = (ynabTxn, accountTxn) => {
-  if (!ynabTxn || !accountTxn) {
+const areEqual = (existingTxn, accountTxn) => {
+  if (!existingTxn || !accountTxn) {
     return false;
   }
 
   return (
-    ynabTxn.date === accountTxn.date &&
-    ynabTxn.amount === accountTxn.amount &&
-    ynabTxn.description === accountTxn.description
+    existingTxn.date === accountTxn.date &&
+    existingTxn.amount === accountTxn.amount &&
+    existingTxn.description === accountTxn.description
   );
 };
 
-const accountReconciler = (ynabTransactions, bankAccount) => {
+const accountReconciler = (knownTransactions, bankAccount) => {
   return {
     [Symbol.iterator]() {
       return {
@@ -20,7 +20,7 @@ const accountReconciler = (ynabTransactions, bankAccount) => {
             return { done: true }
           }
 
-          const t = ynabTransactions.find(ynabTxn =>
+          const t = knownTransactions.find(ynabTxn =>
             areEqual(ynabTxn, nextTransaction)
           );
 
