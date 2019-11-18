@@ -23,9 +23,3 @@ const getSecret = async name => {
 module.exports = {
   getSecret
 };
-
-(async function() {
-  const secret = await getSecret('dejan-cba');
-
-  console.log('secret ', JSON.parse(secret));
-})();

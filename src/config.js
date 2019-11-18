@@ -3,7 +3,7 @@ module.exports = {
   users: [
     {
       user: 'dejan',
-      key: 'dejan-cba-YKp1R7'
+      key: 'dejan-cba'
     }
   ]
 };
