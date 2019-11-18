@@ -36,7 +36,7 @@ const cbaCrawler = (credentials) => {
   };
 };
 
-module.exports = {
+module.exports.default = {
   cbaCredentialReader,
   cbaAccountReader,
   cbaCrawler

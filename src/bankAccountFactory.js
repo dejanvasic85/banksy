@@ -3,6 +3,7 @@ const { cbaCrawler, cbaCredentialReader } = require('./cba');
 const bankAccountFactory = async ({ bankId, credentials }) => {
   switch (bankId) {
     case 'cba': {
+      console.log('IS IT?? ', cbaCredentialReader);
       const credentials = cbaCredentialReader(credentials);
       const crawler = cbaCrawler(credentials);
       await crawler.login();
@@ -19,5 +20,8 @@ const bankAccountFactory = async ({ bankId, credentials }) => {
 };
 
 module.exports = {
-  bankAccountFactory
+  bankAccountFactory,
+  testOnly: () => {
+    return cbaCredentialReader('apple juice is the freaking business');
+  }
 };
