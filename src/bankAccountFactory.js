@@ -1,16 +1,14 @@
-const { cbaCrawler, cbaCredentialReader } = require('./cba');
+const { cbaCrawler } = require('./cba');
 
-const bankAccountFactory = async ({ bankId, credentials }) => {
+const bankAccountFactory = ({ bankId, credentials }) => {
   switch (bankId) {
     case 'cba': {
-      console.log('IS IT?? ', cbaCredentialReader);
-      const credentials = cbaCredentialReader(credentials);
       const crawler = cbaCrawler(credentials);
-      await crawler.login();
-      return await crawler.getAccountReader();
+      return crawler;
     }
     case 'bom': {
       // Todo - create BOM crawler and account reader
+      return null;
     }
 
     default: {
@@ -20,8 +18,5 @@ const bankAccountFactory = async ({ bankId, credentials }) => {
 };
 
 module.exports = {
-  bankAccountFactory,
-  testOnly: () => {
-    return cbaCredentialReader('apple juice is the freaking business');
-  }
+  bankAccountFactory
 };

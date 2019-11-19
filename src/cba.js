@@ -1,3 +1,5 @@
+require('chromedriver');
+const webdriver = require('selenium-webdriver');
 const { decrypt } = require('./encrypt');
 
 const cbaCredentialReader = (key) => {
@@ -32,11 +34,14 @@ const cbaCrawler = (credentials) => {
     getAccountReader: async (accountName) => {
       // Todo - use selenium to fetch the account page
       return cbaAccountReader(accountName);
+    },
+    quit: async () => {
+      // Todo - use selenium to close the browser;
     }
   };
 };
 
-module.exports.default = {
+module.exports = {
   cbaCredentialReader,
   cbaAccountReader,
   cbaCrawler

@@ -5,25 +5,34 @@ const { accountReconciler } = require('./accountReconciler');
 const processUser = async ({ ynabKey, budgetId, banks }) => {
   const ynabAPI = new ynab.API(ynabKey);
 
-  for ({ bankId, credentials, accounts } in banks) {
-    const accountReader = await bankAccountFactory(bankId, credentials);
+  for (const bankConfig of banks) {
+    const bankCrawler = bankAccountFactory(bankConfig);
 
-    for (a in accounts) {
-      await accountReader.openAccount();
-      const ynabTransactions = ynabAPI.transactions.getTransactionsByAccount(budgetId, accountId);
-
-      for (t in accountReconciler(ynabTransactions, accountReader)) {
-        // Todo - Add the transaction in to YNAB
-      }
+    if (!bankCrawler) {
+      continue;
     }
+
+    for (account of bankConfig.accounts) {
+      const { accountName } = account;
+      
+      console.log(`Logging in to ${bankConfig.bankId}. Please wait...`);
+      await bankCrawler.login();
+
+      console.log(`Opening account ${accountName}. Please wait ....`);
+      await bankCrawler.getAccountReader(accountName);
+
+      //const ynabTransactions = ynabAPI.transactions.getTransactionsByAccount(budgetId, accountId);
+
+      // for (t in accountReconciler(ynabTransactions, accountReader)) {
+      //   // Todo - Add the transaction in to YNAB
+      // }
+    }
+
+    console.log(`Done. Closing bank ${bankConfig.bankId}`);
+    await bankCrawler.quit();
   }
 };
 
-const processAll = () => {
-
-}
-
 module.exports = {
-  processAll,
   processUser
 };

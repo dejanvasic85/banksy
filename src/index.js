@@ -1,23 +1,12 @@
-const { key, users } = require('./config');
-const { encrypt } = require('./encrypt');
+const { users } = require('./config');
 const { getSecret } = require('./aws/secretFetcher');
+const { processUser } = require('./bankAccountProcessor');
 
 (async function() {
-
-  //logger.log('Starting... users to process:', users.length);
-
-  // start
-  for (const user of users) {
-    
-
-    const userConfig = await getSecret(user.key);
-
-    
-    
-
+  for (const userData of users) {
+    const { user, key } = userData;
+    const userConfig = await getSecret(key);
+    await processUser(JSON.parse(userConfig));
   }
-
-  
-
 })();
 
