@@ -1,10 +1,8 @@
-const ynab = require('ynab');
 const { bankAccountFactory } = require('./bankAccountFactory');
-const { accountReconciler } = require('./accountReconciler');
+const { getTransactions, saveTransactions } = require('./transactionRepository');
+const { reconcile } = require('./reconciler');
 
-const processUser = async ({ ynabKey, budgetId, banks }) => {
-  const ynabAPI = new ynab.API(ynabKey);
-
+const processUser = async ({ user, banks }) => {
   for (const bankConfig of banks) {
     const bankCrawler = bankAccountFactory(bankConfig);
 
@@ -19,13 +17,11 @@ const processUser = async ({ ynabKey, budgetId, banks }) => {
       await bankCrawler.login();
 
       console.log(`Opening account ${accountName}. Please wait ....`);
-      await bankCrawler.getAccountReader(accountName);
-
-      //const ynabTransactions = ynabAPI.transactions.getTransactionsByAccount(budgetId, accountId);
-
-      // for (t in accountReconciler(ynabTransactions, accountReader)) {
-      //   // Todo - Add the transaction in to YNAB
-      // }
+      const accountReader = await bankCrawler.getAccountReader(accountName);
+      const todaysTransactions = await getTransactions({ user, accountName });
+      const bankTransactions = await accountReader.getTodaysTransactions();
+      const newTransactions = reconcile({ todaysTransactions, bankTransactions });
+      await saveTransactions({ user, accountName, newTransactions });
     }
 
     console.log(`Done. Closing bank ${bankConfig.bankId}`);

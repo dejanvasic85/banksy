@@ -35,6 +35,12 @@ const accountReconciler = (knownTransactions, bankAccount) => {
   };
 };
 
+const reconcile = ({ todaysTransactions, bankTransactions }) => {
+  // Todo compare the two arrays and return new records
+  return [];
+}
+
 module.exports = {
-  accountReconciler
+  accountReconciler,
+  reconcile
 };

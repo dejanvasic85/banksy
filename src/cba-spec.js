@@ -1,7 +1,6 @@
 const { expect } = require('chai');
 
 const {
-  cbaCrawler, 
   cbaCredentialReader
 } = require('./cba');
 
