@@ -1,5 +1,5 @@
 const { users } = require('./config');
-const { getSecret } = require('./aws/secretFetcher');
+const { getSecret } = require('./secretFetcher');
 const { processUser } = require('./bankAccountProcessor');
 
 (async function() {
@@ -9,4 +9,3 @@ const { processUser } = require('./bankAccountProcessor');
     await processUser(JSON.parse(userConfig));
   }
 })();
-
