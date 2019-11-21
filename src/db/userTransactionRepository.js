@@ -9,6 +9,8 @@ const createKey = (date, bankId, accountName, user) => {
   return `${dateStr}-${clean(bankId)}-${clean(accountName)}-${clean(user)}`;
 }
 
+// Example:
+// const data = await getTransactions({ date: today, bankId: 'cba', accountName: 'smart-access', user: 'dejan '})
 const getTransactions = async ({ date, bankId, accountName, user }) => {
   const key = createKey(date, bankId, accountName, user);
 
@@ -31,7 +33,21 @@ const getTransactions = async ({ date, bankId, accountName, user }) => {
   return await UserTransactions.create(newData);
 };
 
+// Example:
+// const txn = { description: 'cool dude', amount: -100 };
+// const data = await updateTransactions(data, [txn]);
+const updateTransactions = async ({ _id }, txns) => {
+  await UserTransactions.findByIdAndUpdate(_id, {
+    $push: {
+      transactions: {
+        $each: txns
+      }
+    }
+  })
+};
+
 module.exports = {
   createKey,
-  getTransactions
+  getTransactions,
+  updateTransactions
 };
