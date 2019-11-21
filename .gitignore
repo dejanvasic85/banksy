@@ -10,3 +10,4 @@ chromedriver.exe
 data.json
 
 .env
+*.log
