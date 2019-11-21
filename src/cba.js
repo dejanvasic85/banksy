@@ -11,7 +11,7 @@ const cbaCredentialReader = (key) => {
 };
 
 const cbaAccountReader = () => {
-  const getTodaysTransactions = async () => {
+  const getNextTransaction = async () => {
     // Todo - use selenium to get the full details of the transaction
   }
 

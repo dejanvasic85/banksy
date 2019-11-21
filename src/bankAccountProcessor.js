@@ -1,5 +1,5 @@
 const { bankAccountFactory } = require('./bankAccountFactory');
-const { getTransactions, saveTransactions } = require('./transactionRepository');
+const { getTransactions, saveTransactions } = require('./db/userTransactionRepository');
 const { reconcile } = require('./reconciler');
 
 const processUser = async ({ user, banks }) => {
