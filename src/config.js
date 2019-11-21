@@ -1,5 +1,9 @@
+const dotenv = require('dotenv');
+dotenv.config();
+
 module.exports = {
-  key: '61019599-6c24-4d07-a10a-48060ee72365',
+  encryptionKey: process.env.ENCRYPTION_KEY,
+  mongoConnection: process.env.MONGO_CONNECTION,
   users: [
     {
       user: 'dejan',

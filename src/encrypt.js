@@ -1,6 +1,6 @@
 const Cryptr = require('cryptr');
-const { key } = require('./config');
-const cryptr = new Cryptr(key);
+const { encryptionKey } = require('./config');
+const cryptr = new Cryptr(encryptionKey);
 
 const encrypt =  (value) => {
   return cryptr.encrypt(value);

@@ -1,4 +1,4 @@
-const getTodaysTransactions = ({ user, accountName }) => {
+const getTransactions = ({ user, accountName }) => {
   // Todo - Fetch known transactions today
 };
 

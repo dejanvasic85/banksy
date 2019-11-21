@@ -8,3 +8,5 @@ jspm_packages
 chromedriver.exe
 
 data.json
+
+.env
