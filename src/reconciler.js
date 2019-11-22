@@ -4,7 +4,6 @@ const areEqual = (existingTxn, accountTxn) => {
   }
 
   return (
-    existingTxn.date === accountTxn.date &&
     existingTxn.amount === accountTxn.amount &&
     existingTxn.description === accountTxn.description
   );
@@ -12,7 +11,12 @@ const areEqual = (existingTxn, accountTxn) => {
 
 const reconcile = ({ todaysTransactions, bankTransactions }) => {
   // Todo compare the two arrays and return new records
-  return [];
+
+  if (bankTransactions.length === 0) {
+    return [];
+  }
+
+  return bankTransactions.filter(bt => !todaysTransactions.some(tt => areEqual(tt, bt)));
 }
 
 module.exports = {
