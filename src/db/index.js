@@ -13,7 +13,11 @@ module.exports = {
         res('connected!');
       });
 
-      mongoose.connect(mongoConnection, { useNewUrlParser: true, useFindAndModify: false });
+      mongoose.connect(mongoConnection, {
+        useNewUrlParser: true,
+        useFindAndModify: false,
+        useUnifiedTopology: true
+      });
     });
   }
 }
