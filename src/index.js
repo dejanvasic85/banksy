@@ -19,7 +19,7 @@ const start = async () => {
     process.exit(0);
   }
   catch (err) {
-    logger.error("WHAT THE", err);
+    logger.error("Crash! Something went completely wrong.", err);
     process.exit(1);
   }
 };
