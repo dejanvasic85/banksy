@@ -6,7 +6,7 @@ import { UserConfig } from './types';
 
 export const processUser = async ({ user, banks }: UserConfig) : Promise<void> => {
   for (const bankConfig of banks) {
-    const bankCrawler = bankAccountFactory(bankConfig);
+    const bankCrawler = await bankAccountFactory(bankConfig);
     
     if (!bankCrawler) {
       continue;

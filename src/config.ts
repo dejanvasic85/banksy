@@ -2,6 +2,7 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 export interface Config {
+  browser: string;
   encryptionKey: string,
   mongoConnection: string,
   users: [{
@@ -11,6 +12,7 @@ export interface Config {
 }
 
 export const config: Config = {
+  browser: 'chrome',
   encryptionKey: process.env.ENCRYPTION_KEY,
   mongoConnection: process.env.MONGO_CONNECTION,
   users: [

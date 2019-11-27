@@ -1,30 +1,30 @@
 export interface BankAccount {
-  accountName: string
+  accountName: string;
 }
 
 export interface Bank {
-  bankId: string,
-  credentials: string,
-  accounts: [BankAccount]
+  bankId: string;
+  credentials: string;
+  accounts: Array<BankAccount>;
 }
 
 export interface UserConfig {
-  user: string,
-  banks: [Bank]
+  user: string;
+  banks: Array<Bank>;
 }
 
 export interface BankAccountReader {
-  getTodaysTransactions() : Promise<[BankTransaction]>,
-  openAccount() : Promise<void>
+  getTodaysTransactions(): Promise<Array<BankTransaction>>;
+  openAccount(): Promise<void>;
 }
 
 export interface BankAccountCrawler {
-  login(): Promise<void>,
-  getAccountReader(accountName: string): Promise<BankAccountReader>
-  quit(): Promise<void>
+  login(): Promise<void>;
+  getAccountReader(accountName: string): Promise<BankAccountReader>;
+  quit(): Promise<void>;
 }
 
 export interface BankTransaction {
-  amount: number,
-  description: string
+  amount: number;
+  description: string;
 }
