@@ -11,3 +11,5 @@ data.json
 
 .env
 *.log
+
+/dist

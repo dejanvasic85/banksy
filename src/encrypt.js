@@ -1,16 +1,12 @@
-const Cryptr = require('cryptr');
-const { encryptionKey } = require('./config');
-const cryptr = new Cryptr(encryptionKey);
+import * as Cryptr from 'cryptr';
+import { config } from './config';
 
-const encrypt =  (value) => {
+const cryptr = new Cryptr(config.encryptionKey);
+
+export const encrypt =  (value) => {
   return cryptr.encrypt(value);
 };
 
-const decrypt = (value) => {
+export const decrypt = (value) => {
   return cryptr.decrypt(value);
 }
-
-module.exports = {
-  encrypt,
-  decrypt
-};
