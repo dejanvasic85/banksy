@@ -2,7 +2,7 @@ require('chromedriver');
 import { decrypt } from './encrypt';
 import { BankAccountReader, BankAccountCrawler, BankTransaction } from './types';
 
-export const cbaCredentialReader = (key: String): any => {
+export const cbaCredentialReader = (key: string): any => {
   const [memberNumber, password] = decrypt(key).split('|');
   return {
     memberNumber,
