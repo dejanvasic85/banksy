@@ -2,7 +2,7 @@ import { config } from './config';
 import { getSecret } from './secretFetcher';
 import { processUser } from './bankAccountProcessor';
 import * as logger from './logger';
-import { connect } from './db/index';
+import { connect } from './db/connect';
 import { UserConfig } from './types';
 
 const start = async () => {

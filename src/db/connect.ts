@@ -1,7 +1,7 @@
 import * as mongoose from 'mongoose';
 import { config } from '../config';
 
-export const connect = async () => {
+export const connect = async () : Promise<any> => {
   return new Promise((res, rej) => {
     const connection = mongoose.connection;
     connection.on('error', () => {

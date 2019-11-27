@@ -11,4 +11,6 @@ const userTransactionSchema = new Schema({
   ]
 });
 
-module.exports = model('UserTransactions', userTransactionSchema);
+const UserTransactions = model('UserTransactions', userTransactionSchema);
+
+export { UserTransactions };

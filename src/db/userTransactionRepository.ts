@@ -1,17 +1,21 @@
-const UserTransactions = require('./userTransactions');
-const dateFormat = require('dateformat');
-const logger = require('../logger');
+import { UserTransactions } from './userTransactions';
+import * as dateFormat from 'dateformat';
+import * as logger from '../logger';
 
-const clean = str => str.trim().replace(' ', '').toLowerCase();
+const clean = str =>
+  str
+    .trim()
+    .replace(' ', '')
+    .toLowerCase();
 
-const createKey = (date, bankId, accountName, user) => {
+export const createKey = (date: Date, bankId: string, accountName: string, user: string) => {
   const dateStr = dateFormat(date, 'yyyymmdd');
   return `${dateStr}-${clean(bankId)}-${clean(accountName)}-${clean(user)}`;
-}
+};
 
 // Example:
 // const data = await getTransactions({ date: today, bankId: 'cba', accountName: 'smart-access', user: 'dejan '})
-const getTransactions = async ({ date, bankId, accountName, user }) => {
+export const getTransactions = async ({ date, bankId, accountName, user }) => {
   const key = createKey(date, bankId, accountName, user);
 
   logger.info(`Fetching transactions for ${key}`);
@@ -27,7 +31,7 @@ const getTransactions = async ({ date, bankId, accountName, user }) => {
   const newData = {
     _id: key,
     date: today,
-    transactions: []
+    transactions: [],
   };
 
   return await UserTransactions.create(newData);
@@ -36,18 +40,12 @@ const getTransactions = async ({ date, bankId, accountName, user }) => {
 // Example:
 // const txn = { description: 'cool dude', amount: -100 };
 // const data = await updateTransactions(data, [txn]);
-const updateTransactions = async ({ _id }, txns) => {
+export const updateTransactions = async ({ _id }, txns) => {
   await UserTransactions.findByIdAndUpdate(_id, {
     $push: {
       transactions: {
-        $each: txns
-      }
-    }
-  })
-};
-
-module.exports = {
-  createKey,
-  getTransactions,
-  updateTransactions
+        $each: txns,
+      },
+    },
+  });
 };
