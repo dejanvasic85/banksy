@@ -1,7 +1,7 @@
 import { bankAccountFactory } from './bankAccountFactory';
 import { getTransactions } from './db/userTransactionRepository';
 import { reconcile } from './reconciler';
-import * as logger from './logger';
+import logger from './logger';
 import { UserConfig } from './types';
 
 export const processUser = async ({ user, banks }: UserConfig) : Promise<void> => {

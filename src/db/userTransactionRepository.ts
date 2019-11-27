@@ -1,6 +1,6 @@
 import { UserTransactions } from './userTransactions';
 import * as dateFormat from 'dateformat';
-import * as logger from '../logger';
+import logger from '../logger';
 
 const clean = str =>
   str
