@@ -3,8 +3,11 @@ import { Builder, By, Key, until } from 'selenium-webdriver';
 import { decrypt } from './encrypt';
 import { BankAccountReader, BankAccountCrawler, BankTransaction } from './types';
 import { config } from './config';
+import * as dateFormat from 'dateformat';
+import logger from './logger';
 
 const LOGIN_PAGE_URL = 'https://www.my.commbank.com.au/netbank/Logon/Logon.aspx';
+const CBA_DATE_FORMAT = 'dd mmm yyyy';
 
 export const cbaCredentialReader = (key: string): any => {
   const [memberNumber, password] = decrypt(key).split('|');
@@ -18,11 +21,18 @@ export const cbaAccountReader = (driver: any): BankAccountReader => {
   return {
     getTodaysTransactions: async (): Promise<Array<BankTransaction>> => {
       const txns = [];
-      const tableBody = await driver.findElement(By.id('transactionsTableBody')).findElements();
-      const rows = tableBody.findElements(By.css('tr'));
+      const today = dateFormat(new Date(), CBA_DATE_FORMAT);
+      
+      // Find the transaction table
+      const tableBody = await driver.findElement(By.id('transactionsTableBody'));
+      const rows = tableBody.findElements(By.tagName('tr'));
+
       for (const r of rows) {
         const date = await r.findElement(By.className('date')).getText();
-        
+        logger.info(`Comparing date netbank date ${date} to ${today}`);
+        if (date === today) {
+          logger.info('Found transaction');
+        }
       }
 
       return txns;
