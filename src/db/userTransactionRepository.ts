@@ -1,6 +1,7 @@
 import { UserTransactions } from './userTransactions';
 import * as dateFormat from 'dateformat';
 import logger from '../logger';
+import { BankTransaction } from '../types';
 
 const clean = str =>
   str
@@ -40,8 +41,8 @@ export const getTransactions = async ({ date, bankId, accountName, user }) => {
 // Example:
 // const txn = { description: 'cool dude', amount: -100 };
 // const data = await updateTransactions(data, [txn]);
-export const updateTransactions = async ({ _id }, txns) => {
-  await UserTransactions.findByIdAndUpdate(_id, {
+export const updateTransactions = async (id: string, txns: BankTransaction[]) => {
+  await UserTransactions.findByIdAndUpdate(id, {
     $push: {
       transactions: {
         $each: txns,

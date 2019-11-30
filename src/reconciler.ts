@@ -14,10 +14,13 @@ const areEqual = (existingTxn: BankTransaction, accountTxn: BankTransaction) => 
 };
 
 export const reconcile = ({ cachedTransactions, bankTransactions }: ReconcileParams): BankTransaction[] => {
-  console.log('cached', cachedTransactions, 'bank', bankTransactions);
-
   if (bankTransactions.length === 0) {
     return [];
+  }
+
+  if (!cachedTransactions) {
+    // return all
+    return bankTransactions;
   }
 
   return bankTransactions.filter(bt => !cachedTransactions.some(tt => areEqual(tt, bt)));
