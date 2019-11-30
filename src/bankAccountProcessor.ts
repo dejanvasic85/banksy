@@ -1,13 +1,13 @@
 import { bankAccountFactory } from './bankAccountFactory';
-import { getTransactions } from './db/userTransactionRepository';
+import { getTransactions, updateTransactions } from './db/userTransactionRepository';
 import { reconcile } from './reconciler';
 import logger from './logger';
 import { UserConfig } from './types';
 
-export const processUser = async ({ user, banks }: UserConfig) : Promise<void> => {
+export const processUser = async ({ user, banks }: UserConfig): Promise<void> => {
   for (const bankConfig of banks) {
     const bankCrawler = await bankAccountFactory(bankConfig);
-    
+
     if (!bankCrawler) {
       continue;
     }
@@ -15,7 +15,7 @@ export const processUser = async ({ user, banks }: UserConfig) : Promise<void> =
     logger.info(`Logging in to ${bankConfig.bankId}. Please wait...`);
     await bankCrawler.login();
 
-    for (const account of bankConfig.accounts) {
+    for (const account of bankConfig.accounts.filter(a => a.active)) {
       try {
         const { accountName } = account;
         const accountReader = await bankCrawler.getAccountReader(accountName);
@@ -27,11 +27,12 @@ export const processUser = async ({ user, banks }: UserConfig) : Promise<void> =
           accountName,
           user,
         });
-        
+
         const bankTransactions = await accountReader.getTodaysTransactions();
 
-        // const newTransactions = reconcile({ todaysTransactions, bankTransactions });
-        // await saveTransactions({ user, accountName, newTransactions });
+        logger.info('Found transactions', bankTransactions);
+        // const newTransactions = reconcile({ cachedTransactions, bankTransactions });
+        // await updateTransactions({ user, accountName, newTransactions });
       } catch (err) {
         logger.error('An error occurred while processing', err);
       }

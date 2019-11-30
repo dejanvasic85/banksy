@@ -1,4 +1,5 @@
 import { cbaCrawler } from './cba';
+import { bomCrawler } from './bom';
 import { BankAccountCrawler } from './types';
 
 export const bankAccountFactory = async ({ bankId, credentials }) : Promise<BankAccountCrawler>  => {
@@ -7,8 +8,7 @@ export const bankAccountFactory = async ({ bankId, credentials }) : Promise<Bank
       return await cbaCrawler(credentials);
     }
     case 'bom': {
-      // Todo - create BOM crawler and account reader
-      return null;
+      return await bomCrawler(credentials);
     }
 
     default: {

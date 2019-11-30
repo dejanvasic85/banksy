@@ -9,7 +9,12 @@ import logger from './logger';
 const LOGIN_PAGE_URL = 'https://www.my.commbank.com.au/netbank/Logon/Logon.aspx';
 const CBA_DATE_FORMAT = 'dd mmm yyyy';
 
-export const cbaCredentialReader = (key: string): any => {
+interface CbaCredentials {
+  memberNumber: string,
+  password: string,
+}
+
+export const cbaCredentialReader = (key: string): CbaCredentials => {
   const [memberNumber, password] = decrypt(key).split('|');
   return {
     memberNumber,
@@ -19,10 +24,10 @@ export const cbaCredentialReader = (key: string): any => {
 
 export const cbaAccountReader = (driver: any): BankAccountReader => {
   return {
-    getTodaysTransactions: async (): Promise<Array<BankTransaction>> => {
+    getTodaysTransactions: async (): Promise<BankTransaction[]> => {
       const txns = [];
       const today = dateFormat(new Date(), CBA_DATE_FORMAT);
-      
+
       // Find the transaction table
       const tableBody = await driver.findElement(By.id('transactionsTableBody'));
       const rows = tableBody.findElements(By.tagName('tr'));
@@ -37,12 +42,11 @@ export const cbaAccountReader = (driver: any): BankAccountReader => {
 
       return txns;
     },
-    openAccount: async () => {},
   };
 };
 
 export const cbaCrawler = async (credentials: string): Promise<BankAccountCrawler> => {
-  const { memberNumber, password } = cbaCredentialReader(credentials);
+  const { memberNumber, password } : CbaCredentials = cbaCredentialReader(credentials);
   const driver = await new Builder().forBrowser(config.browser).build();
 
   return {

@@ -1,21 +1,21 @@
 export interface BankAccount {
   accountName: string;
+  active: boolean;
 }
 
 export interface Bank {
   bankId: string;
   credentials: string;
-  accounts: Array<BankAccount>;
+  accounts: BankAccount[];
 }
 
 export interface UserConfig {
   user: string;
-  banks: Array<Bank>;
+  banks: Bank[];
 }
 
 export interface BankAccountReader {
-  getTodaysTransactions(): Promise<Array<BankTransaction>>;
-  openAccount(): Promise<void>;
+  getTodaysTransactions(): Promise<BankTransaction[]>;
 }
 
 export interface BankAccountCrawler {
