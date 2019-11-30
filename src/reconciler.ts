@@ -1,7 +1,7 @@
 import { BankTransaction } from './types';
 
 export interface ReconcileParams {
-  todaysTransactions: BankTransaction[];
+  cachedTransactions: BankTransaction[];
   bankTransactions: BankTransaction[];
 }
 
@@ -13,12 +13,12 @@ const areEqual = (existingTxn: BankTransaction, accountTxn: BankTransaction) => 
   return existingTxn.amount === accountTxn.amount && existingTxn.description === accountTxn.description;
 };
 
-export const reconcile = ({ todaysTransactions, bankTransactions }: ReconcileParams): BankTransaction[] => {
-  // Todo compare the two arrays and return new records
+export const reconcile = ({ cachedTransactions, bankTransactions }: ReconcileParams): BankTransaction[] => {
+  console.log('cached', cachedTransactions, 'bank', bankTransactions);
 
   if (bankTransactions.length === 0) {
     return [];
   }
 
-  return bankTransactions.filter(bt => !todaysTransactions.some(tt => areEqual(tt, bt)));
+  return bankTransactions.filter(bt => !cachedTransactions.some(tt => areEqual(tt, bt)));
 };

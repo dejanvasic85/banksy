@@ -4,7 +4,7 @@
   "description": "",
   "main": "handler.js",
   "scripts": {
-    "test": "./node_modules/.bin/_mocha **/*-spec.js",
+    "test": "mocha -r ts-node/register **/*-spec.ts",
     "start": "ts-node ./src/index.ts"
   },
   "keywords": [],
@@ -23,6 +23,8 @@
     "ynab": "^1.17.0"
   },
   "devDependencies": {
+    "@types/chai": "^4.2.5",
+    "@types/mocha": "^5.2.7",
     "chai": "^4.2.0",
     "mocha": "^6.2.2",
     "sinon": "^7.5.0",

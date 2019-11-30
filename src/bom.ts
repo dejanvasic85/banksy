@@ -23,9 +23,11 @@ export const bomCredentialsReader = (key: string): BomCredentials => {
   };
 };
 
-export const parseAmount = (debit: string, credit: string) => {
-  const amountInText = debit.length > 0 ? debit : credit;
-  return parseFloat(amountInText.replace('$', '').replace(',', ''));
+export const parseAmount = (debit: string, credit: string): number => {
+  let isDebit = debit.length > 0;
+  let amountInText = isDebit ? debit : credit;
+  const amount = parseFloat(amountInText.replace('$', '').replace(',', ''));
+  return isDebit ? -amount : amount;
 };
 
 export const bomAccountReader = (driver: any): BankAccountReader => {
@@ -45,11 +47,14 @@ export const bomAccountReader = (driver: any): BankAccountReader => {
           continue;
         }
 
-        const amount = parseAmount(columns[3].getText(), columns[4].getText());
+        const debit = await columns[3].getText();
+        const credit = await columns[4].getText();
+        const description = await columns[2].getText();
+        const amount = parseAmount(debit, credit);
 
         txns.push({
           amount,
-          description: columns[2],
+          description,
         });
       }
 
