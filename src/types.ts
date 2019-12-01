@@ -9,9 +9,23 @@ export interface Bank {
   accounts: BankAccount[];
 }
 
+export enum PublisherType {
+  SNS,
+}
+
+export interface PublisherConfig {
+  type: PublisherType;
+  address: string;
+}
+
+export interface Publisher {
+  publish: (data: string, address: string) => Promise<void>;
+}
+
 export interface UserConfig {
   user: string;
   banks: Bank[];
+  publisherConfig: PublisherConfig;
 }
 
 export interface BankAccountReader {

@@ -12,8 +12,8 @@ const start = async () => {
 
     logger.info(result);
     for (const userData of config.users) {
-      const { key } = userData;
-      const userSecret = await getSecret(key);
+      const { secretKey } = userData;
+      const userSecret = await getSecret(secretKey);
       if (userSecret) {
         const userConfig : UserConfig = JSON.parse(userSecret);
         await processUser(userConfig);

@@ -3,12 +3,14 @@ dotenv.config();
 
 export interface Config {
   browser: string;
-  encryptionKey: string,
-  mongoConnection: string,
-  users: [{
-    user: string,
-    key: string
-  }]
+  encryptionKey: string;
+  mongoConnection: string;
+  users: [
+    {
+      user: string;
+      secretKey: string;
+    },
+  ];
 }
 
 export const config: Config = {
@@ -18,7 +20,7 @@ export const config: Config = {
   users: [
     {
       user: 'dejan',
-      key: 'dejan-cba'
-    }
-  ]
+      secretKey: 'dejan-cba',
+    },
+  ],
 };

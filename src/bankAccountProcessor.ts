@@ -3,8 +3,9 @@ import { getTransactions, updateTransactions } from './db/userTransactionReposit
 import { reconcile } from './reconciler';
 import logger from './logger';
 import { UserConfig } from './types';
+import { publish } from './publisher';
 
-export const processUser = async ({ user, banks }: UserConfig): Promise<void> => {
+export const processUser = async ({ user, banks, publisherConfig }: UserConfig): Promise<void> => {
   for (const bankConfig of banks) {
     const accounts = bankConfig.accounts.filter(a => a.active);
 
@@ -42,6 +43,7 @@ export const processUser = async ({ user, banks }: UserConfig): Promise<void> =>
         if (newTransactions.length > 0) {
           logger.info(`New Transactions. Found total ${newTransactions.length}`);
           await updateTransactions(cached._id, newTransactions);
+          await publish(publisherConfig, newTransactions);
         }
       } catch (err) {
         logger.error('An error occurred while processing', err);
