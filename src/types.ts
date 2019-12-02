@@ -1,6 +1,7 @@
 export interface BankAccount {
   accountName: string;
   active: boolean;
+  pendingTransactionsOnly: boolean;
 }
 
 export interface Bank {
@@ -9,12 +10,8 @@ export interface Bank {
   accounts: BankAccount[];
 }
 
-export enum PublisherType {
-  SNS,
-}
-
 export interface PublisherConfig {
-  type: PublisherType;
+  type: string;
   address: string;
 }
 

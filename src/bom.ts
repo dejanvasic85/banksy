@@ -1,5 +1,5 @@
 require('chromedriver');
-import { Builder, By, Key, until } from 'selenium-webdriver';
+import { Builder, By } from 'selenium-webdriver';
 import { decrypt } from './encrypt';
 import { BankAccountReader, BankAccountCrawler, BankTransaction } from './types';
 import { config } from './config';

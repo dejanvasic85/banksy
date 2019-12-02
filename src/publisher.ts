@@ -1,10 +1,10 @@
 import { SNS } from 'aws-sdk';
-import { BankTransaction, PublisherConfig, PublisherType } from './types';
+import { BankTransaction, PublisherConfig } from './types';
 import logger from './logger';
 
 export const publish = async (config: PublisherConfig, transactions: BankTransaction[]): Promise<boolean> => {
   switch (config.type) {
-    case PublisherType.SNS:
+    case 'sns':
       return await publishToSns(config.address, transactions);
     default: 
       throw new Error('Unsupported publisher config');
