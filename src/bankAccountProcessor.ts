@@ -19,13 +19,14 @@ export const processUser = async ({ user, banks, publisherConfig }: UserConfig):
       continue;
     }
 
-    logger.info(`Logging in to ${bankConfig.bankId}. Please wait...`);
+    logger.info(`bankAccountProcessor: Logging in to ${bankConfig.bankId}. Please wait...`);
     await bankCrawler.login();
 
     for (const account of accounts) {
       try {
+        logger.info(`bankAccountProcessor: Processing account ${account.accountName}`);
         const { accountName } = account;
-        const accountReader = await bankCrawler.getAccountReader(accountName);
+        const accountReader = await bankCrawler.getAccountReader(account);
         const now = new Date();
 
         const cached = await getTransactions({
@@ -36,17 +37,16 @@ export const processUser = async ({ user, banks, publisherConfig }: UserConfig):
         });
 
         const bankTransactions = await accountReader.getTodaysTransactions();
-
-        logger.info('Found transactions', bankTransactions);
-
         const newTransactions = reconcile({ cachedTransactions: cached.transactions, bankTransactions });
+        
         if (newTransactions.length > 0) {
-          logger.info(`New Transactions. Found total ${newTransactions.length}`);
+          logger.info(`bankAccountProcessor: New Transactions. Found total of ${newTransactions.length}`);
           await updateTransactions(cached._id, newTransactions);
           await publish(publisherConfig, newTransactions);
         }
+        
       } catch (err) {
-        logger.error('An error occurred while processing', err);
+        logger.error('An error occurred while processing. ', err);
       }
     }
 

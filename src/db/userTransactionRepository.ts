@@ -19,15 +19,13 @@ export const createKey = (date: Date, bankId: string, accountName: string, user:
 export const getTransactions = async ({ date, bankId, accountName, user }) => {
   const key = createKey(date, bankId, accountName, user);
 
-  logger.info(`Fetching transactions for ${key}`);
+  logger.info(`userTransactionRepository. Fetching transactions for ${key}`);
   const todaysTransactions = await UserTransactions.findById(key);
   if (todaysTransactions) {
-    logger.info('Found');
     return todaysTransactions;
   }
 
   // Create default document for today with empty txns
-  logger.info('Not found. Creating.');
   var today = dateFormat((new Date(), 'yyyymmdd'));
   const newData = {
     _id: key,

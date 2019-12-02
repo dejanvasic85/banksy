@@ -1,7 +1,7 @@
 export interface BankAccount {
   accountName: string;
   active: boolean;
-  pendingTransactionsOnly: boolean;
+  pendingTransactionsOnly?: boolean;
 }
 
 export interface Bank {
@@ -31,7 +31,7 @@ export interface BankAccountReader {
 
 export interface BankAccountCrawler {
   login(): Promise<void>;
-  getAccountReader(accountName: string): Promise<BankAccountReader>;
+  getAccountReader(account: BankAccount): Promise<BankAccountReader>;
   quit(): Promise<void>;
 }
 

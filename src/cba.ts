@@ -1,7 +1,7 @@
 require('chromedriver');
 import { Builder, By, Key, until } from 'selenium-webdriver';
 import { decrypt } from './encrypt';
-import { BankAccountReader, BankAccountCrawler, BankTransaction } from './types';
+import { BankAccountReader, BankAccountCrawler, BankTransaction, BankAccount } from './types';
 import { config } from './config';
 import * as dateFormat from 'dateformat';
 import logger from './logger';
@@ -56,9 +56,9 @@ export const cbaCrawler = async (credentials: string): Promise<BankAccountCrawle
       await driver.findElement(By.id('txtMyPassword_field')).sendKeys(password);
       await driver.findElement(By.id('btnLogon_field')).click();
     },
-    getAccountReader: async (accountName: string): Promise<BankAccountReader> => {
+    getAccountReader: async (account: BankAccount): Promise<BankAccountReader> => {
       // Todo - use selenium to fetch the account page
-      await driver.findElement(By.linkText(accountName)).click();
+      await driver.findElement(By.linkText(account.accountName)).click();
       return cbaAccountReader(driver);
     },
     quit: async () => {
