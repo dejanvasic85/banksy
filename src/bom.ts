@@ -1,5 +1,5 @@
 require('chromedriver');
-import { Builder, By } from 'selenium-webdriver';
+import { Builder, By, WebElement, WebDriver, until } from 'selenium-webdriver';
 import { decrypt } from './encrypt';
 import { BankAccountReader, BankAccountCrawler, BankTransaction, BankAccount } from './types';
 import { config } from './config';
@@ -31,26 +31,36 @@ export const parseAmount = (debit: string, credit: string): number => {
   return isDebit ? -amount : amount;
 };
 
-const getTransactionRows = async (driver: any) => {
+const pause = async () => Promise<void> {
+  
+}
+
+const getTransactionRows = async (driver: WebDriver) : Promise<WebElement[]> => {
   // Click on the "All" tab
-  await driver.findElement(By.css('[href="#transaction-all"]')).click();
+  await driver.findElement(By.css(`a[href="#transaction-all"]`)).click();
 
   // That will render elements with 'clickable-trans' class which contain actual transactions! woohooo
-  return await driver.findElements(By.css('.clickable-trans'));
+  const items = await driver.wait(until.elementsLocated(By.css(`.clickable-trans`)));
+
+  await pause(9000)
+
+  return items;
 }
 
-const getPendingTransactionRows = async (driver: any) => {
-  return await driver.findElements(By.css());
+const getPendingTransactionRows = async (driver: WebDriver) : Promise<WebElement[]> => {
+  return await driver.findElements(By.css(`.transaction-pending > table > tbody > tr`));
 }
 
-export const bomAccountReader = (driver: any, account: BankAccount): BankAccountReader => {
+export const bomAccountReader = (driver: WebDriver, account: BankAccount): BankAccountReader => {
   return {
     getTodaysTransactions: async (): Promise<BankTransaction[]> => {
       const txns = [];
       const today = dateFormat(new Date(), BOM_DATE_FORMAT);
       const rows = account.pendingTransactionsOnly
-        ? await driver.findElements(By.css('.transaction-pending > table > tbody > tr'))
-        : await getPendingTransactionRows(driver);
+        ? await getPendingTransactionRows(driver)
+        : await getTransactionRows(driver);
+
+      logger.info(`Found [${rows.length}] rows for account [${account.accountName}] `)
 
       for (const row of rows) {
         const columns = await row.findElements(By.css('td'));
@@ -90,8 +100,10 @@ export const bomCrawler = async (credentials: string): Promise<BankAccountCrawle
     getAccountReader: async (account: BankAccount): Promise<BankAccountReader> => {
 
       // Todo - press button to go home first and then click on the account!
+      await driver.findElement(By.css(`a[href="viewAccountPortfolio.html"]`)).click();
 
       // <li> data-acctalias="Amplify Signature" > h2 > a click
+      logger.info(`Clicking on account [${account.accountName}]`);
       await driver.findElement(By.css(`[data-acctalias="${account.accountName}"] > h2 > a`)).click();
       
       return bomAccountReader(driver, account);
