@@ -9,6 +9,10 @@ import logger from './logger';
 const LOGIN_PAGE_URL = 'https://ibanking.bankofmelbourne.com.au/ibank/loginPage.action';
 const BOM_DATE_FORMAT = 'dd/mm/yyyy';
 
+const pause = (ms) : Promise<void> => {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 export interface BomCredentials {
   accessNumber: string;
   securityNumber: string;
@@ -31,10 +35,6 @@ export const parseAmount = (debit: string, credit: string): number => {
   return isDebit ? -amount : amount;
 };
 
-const pause = async () => Promise<void> {
-  
-}
-
 const getTransactionRows = async (driver: WebDriver) : Promise<WebElement[]> => {
   // Click on the "All" tab
   await driver.findElement(By.css(`a[href="#transaction-all"]`)).click();
@@ -42,7 +42,7 @@ const getTransactionRows = async (driver: WebDriver) : Promise<WebElement[]> => 
   // That will render elements with 'clickable-trans' class which contain actual transactions! woohooo
   const items = await driver.wait(until.elementsLocated(By.css(`.clickable-trans`)));
 
-  await pause(9000)
+  await pause(19000);
 
   return items;
 }
