@@ -28,21 +28,24 @@ export const parseAmount = (debit: string, credit: string): number => {
   let isDebit = debit.length > 0;
   let amountInText = isDebit ? debit : credit;
   const amount = parseFloat(amountInText.replace('$', '').replace(',', ''));
+
+  if (Number.isNaN(amount)) {
+    return null;
+  }
+
   return isDebit ? -amount : amount;
 };
 
-const pause = async () => Promise<void> {
-  
+const pause = async (ms) : Promise<void> => {
+  return new Promise(res => setTimeout(res, ms));
 }
 
 const getTransactionRows = async (driver: WebDriver) : Promise<WebElement[]> => {
-  // Click on the "All" tab
+  // Click on the "All" tab (this will be easier to fetch the transactions row below)
   await driver.findElement(By.css(`a[href="#transaction-all"]`)).click();
 
   // That will render elements with 'clickable-trans' class which contain actual transactions! woohooo
   const items = await driver.wait(until.elementsLocated(By.css(`.clickable-trans`)));
-
-  await pause(9000)
 
   return items;
 }
@@ -74,6 +77,10 @@ export const bomAccountReader = (driver: WebDriver, account: BankAccount): BankA
         const credit = await columns[4].getText();
         const description = await columns[2].getText();
         const amount = parseAmount(debit, credit);
+        if (!amount) {
+          // The amount sometimes is an empty value! 
+          continue;
+        }
 
         txns.push({
           amount,
