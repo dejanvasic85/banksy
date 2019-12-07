@@ -1,10 +1,10 @@
 require('chromedriver');
 import { Builder, By, WebElement, WebDriver, until } from 'selenium-webdriver';
-import { decrypt } from './encrypt';
-import { BankAccountReader, BankAccountCrawler, BankTransaction, BankAccount } from './types';
-import { config } from './config';
+import { decrypt } from '../encrypt';
+import { BankAccountReader, BankAccountCrawler, BankTransaction, BankAccount } from '../types';
+import { config } from '../config';
 import * as dateFormat from 'dateformat';
-import logger from './logger';
+import logger from '../logger';
 
 const LOGIN_PAGE_URL = 'https://ibanking.bankofmelbourne.com.au/ibank/loginPage.action';
 const BOM_DATE_FORMAT = 'dd/mm/yyyy';
