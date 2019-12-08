@@ -1,5 +1,5 @@
-import { cbaCrawler } from './cba';
-import { bomCrawler } from './bom';
+import { cbaCrawler } from './banks/cba';
+import { bomCrawler } from './banks/bom';
 import { BankAccountCrawler } from './types';
 
 export const bankAccountFactory = async ({ bankId, credentials }) : Promise<BankAccountCrawler>  => {

@@ -1,17 +1,13 @@
 require('chromedriver');
 import { Builder, By, WebElement, WebDriver, until } from 'selenium-webdriver';
-import { decrypt } from './encrypt';
-import { BankAccountReader, BankAccountCrawler, BankTransaction, BankAccount } from './types';
-import { config } from './config';
+import { decrypt } from '../encrypt';
+import { BankAccountReader, BankAccountCrawler, BankTransaction, BankAccount } from '../types';
+import { config } from '../config';
 import * as dateFormat from 'dateformat';
-import logger from './logger';
+import logger from '../logger';
 
 const LOGIN_PAGE_URL = 'https://ibanking.bankofmelbourne.com.au/ibank/loginPage.action';
 const BOM_DATE_FORMAT = 'dd/mm/yyyy';
-
-const pause = (ms) : Promise<void> => {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
 
 export interface BomCredentials {
   accessNumber: string;
@@ -32,17 +28,20 @@ export const parseAmount = (debit: string, credit: string): number => {
   let isDebit = debit.length > 0;
   let amountInText = isDebit ? debit : credit;
   const amount = parseFloat(amountInText.replace('$', '').replace(',', ''));
+
+  if (Number.isNaN(amount)) {
+    return null;
+  }
+
   return isDebit ? -amount : amount;
 };
 
 const getTransactionRows = async (driver: WebDriver) : Promise<WebElement[]> => {
-  // Click on the "All" tab
+  // Click on the "All" tab (this will be easier to fetch the transactions row below)
   await driver.findElement(By.css(`a[href="#transaction-all"]`)).click();
 
   // That will render elements with 'clickable-trans' class which contain actual transactions! woohooo
   const items = await driver.wait(until.elementsLocated(By.css(`.clickable-trans`)));
-
-  await pause(19000);
 
   return items;
 }
@@ -74,6 +73,10 @@ export const bomAccountReader = (driver: WebDriver, account: BankAccount): BankA
         const credit = await columns[4].getText();
         const description = await columns[2].getText();
         const amount = parseAmount(debit, credit);
+        if (!amount) {
+          // The amount sometimes is an empty value! 
+          continue;
+        }
 
         txns.push({
           amount,

@@ -39,3 +39,9 @@ export interface BankTransaction {
   amount: number;
   description: string;
 }
+
+export interface TransactionsMessage {
+  bankId: string;
+  accountName: string;
+  transactions: BankTransaction[];
+}

@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { cbaCredentialReader } from './cba';
-import { encrypt } from './encrypt';
+import { encrypt } from '../encrypt';
 
 describe('cba', () => {
   describe('cbaCredentialsReader', () => {

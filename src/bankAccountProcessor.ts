@@ -2,7 +2,7 @@ import { bankAccountFactory } from './bankAccountFactory';
 import { getTransactions, updateTransactions } from './db/userTransactionRepository';
 import { reconcile } from './reconciler';
 import logger from './logger';
-import { UserConfig } from './types';
+import { UserConfig, TransactionsMessage } from './types';
 import { publish } from './publisher';
 
 export const processUser = async ({ user, banks, publisherConfig }: UserConfig): Promise<void> => {
@@ -42,7 +42,12 @@ export const processUser = async ({ user, banks, publisherConfig }: UserConfig):
         if (newTransactions.length > 0) {
           logger.info(`bankAccountProcessor: New Transactions. Found total of ${newTransactions.length}`);
           await updateTransactions(cached._id, newTransactions);
-          await publish(publisherConfig, newTransactions);
+          const message : TransactionsMessage = {
+            bankId: bankConfig.bankId,
+            accountName,
+            transactions: newTransactions 
+          };
+          await publish(publisherConfig, message);
         }
         
       } catch (err) {

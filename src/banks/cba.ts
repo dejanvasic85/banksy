@@ -1,10 +1,11 @@
 require('chromedriver');
-import { Builder, By, Key, until } from 'selenium-webdriver';
-import { decrypt } from './encrypt';
-import { BankAccountReader, BankAccountCrawler, BankTransaction, BankAccount } from './types';
-import { config } from './config';
 import * as dateFormat from 'dateformat';
-import logger from './logger';
+import { Builder, By, Key, until } from 'selenium-webdriver';
+
+import { decrypt } from '../encrypt';
+import { BankAccountReader, BankAccountCrawler, BankTransaction, BankAccount } from '../types';
+import { config } from '../config';
+import logger from '../logger';
 
 const LOGIN_PAGE_URL = 'https://www.my.commbank.com.au/netbank/Logon/Logon.aspx';
 const CBA_DATE_FORMAT = 'dd mmm yyyy';
