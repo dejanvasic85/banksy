@@ -27,7 +27,7 @@ const logger = createLogger({
 
     new SumoLogic({
       url: config.sumoLogicUrl,
-      interval: 100,
+      interval: 5,
       onError: async(err) => {
         // Just log it to the console
         console.log('sumo log error', err);
