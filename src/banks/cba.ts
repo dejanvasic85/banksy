@@ -1,6 +1,6 @@
 require('chromedriver');
 import * as dateFormat from 'dateformat';
-import { By } from 'selenium-webdriver';
+import { By, WebDriver, until } from 'selenium-webdriver';
 import { createDriver } from './driver';
 import { decrypt } from '../encrypt';
 import { BankAccountReader, BankAccountCrawler, BankTransaction, BankAccount } from '../types';
@@ -22,19 +22,18 @@ export const cbaCredentialReader = (key: string): CbaCredentials => {
   };
 };
 
-export const cbaAccountReader = (driver: any): BankAccountReader => {
+export const cbaAccountReader = (driver: WebDriver, account: BankAccount): BankAccountReader => {
   return {
     getTodaysTransactions: async (): Promise<BankTransaction[]> => {
       const txns = [];
       const today = dateFormat(new Date(), CBA_DATE_FORMAT);
-
-      // Find the transaction table
-      const tableBody = await driver.findElement(By.id('transactionsTableBody'));
-      const rows = tableBody.findElements(By.tagName('tr'));
+      const rows = await driver.wait(until.elementsLocated(By.css('[data-issynced]')));
+      logger.info(`Found [${rows.length}] rows for account [${account.accountName}] `);
 
       for (const r of rows) {
         const date = await r.findElement(By.className('date')).getText();
         logger.info(`Comparing date netbank date ${date} to ${today}`);
+
         if (date === today) {
           logger.info('Found transaction');
         }
@@ -57,9 +56,13 @@ export const cbaCrawler = async (credentials: string): Promise<BankAccountCrawle
       await driver.findElement(By.id('btnLogon_field')).click();
     },
     getAccountReader: async (account: BankAccount): Promise<BankAccountReader> => {
-      // Todo - use selenium to fetch the account page
-      await driver.findElement(By.linkText(account.accountName)).click();
-      return cbaAccountReader(driver);
+      const homeLink = await driver.wait(until.elementLocated(By.linkText('My home')));
+      await homeLink.click();
+
+      const link = await driver.wait(until.elementLocated(By.linkText(account.accountName)));
+      await link.click();
+
+      return cbaAccountReader(driver, account);
     },
     quit: async () => {
       // Todo - use selenium to close the browser;
