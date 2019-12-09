@@ -13,3 +13,5 @@ data.json
 *.log
 
 /dist
+
+secret-*

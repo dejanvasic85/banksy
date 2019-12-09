@@ -6,6 +6,7 @@ export interface Config {
   encryptionKey: string;
   mongoConnection: string;
   sumoLogicUrl: string;
+  useLocalSecrets: boolean;
   users: [
     {
       user: string;
@@ -19,6 +20,7 @@ export const config: Config = {
   encryptionKey: process.env.ENCRYPTION_KEY,
   mongoConnection: process.env.MONGO_CONNECTION,
   sumoLogicUrl: process.env.SUMO_HTTP_URL,
+  useLocalSecrets: process.env.USE_LOCAL_SECRETS === 'true',
   users: [
     {
       user: 'dejan',
