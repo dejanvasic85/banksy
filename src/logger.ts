@@ -1,16 +1,19 @@
 import { createLogger, transports, format } from 'winston';
+import { config } from './config';
+import { SumoLogic } from 'winston-sumologic-transport';
 
-export default createLogger({
+const logger = createLogger({
   level: 'info',
   format: format.combine(
     format.timestamp({
-      format: 'YYYY-MM-DD HH:mm:ss'
+      format: 'YYYY-MM-DD HH:mm:ss',
     }),
     format.errors({ stack: true }),
     format.splat(),
-    format.json()
+    format.json(),
   ),
   defaultMeta: { service: 'banksy' },
+  // @ts-ignore
   transports: [
     //
     // - Write to all logs with level `info` and below to `quick-start-combined.log`.
@@ -20,6 +23,12 @@ export default createLogger({
     new transports.File({ filename: 'logs-all.log' }),
 
     // Everything goes to console as well
-    new transports.Console({ format: format.combine(format.colorize(), format.simple()) })
-  ]
+    new transports.Console({ format: format.combine(format.colorize(), format.simple()) }),
+
+    new SumoLogic({
+      url: config.sumoLogicUrl,
+    }),
+  ],
 });
+
+export default logger;
