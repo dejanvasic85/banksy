@@ -1,10 +1,7 @@
-require('chromedriver');
-
-const chrome = require('selenium-webdriver/chrome');
-import { Builder, By, WebElement, WebDriver, until, Capabilities } from 'selenium-webdriver';
+import { By, WebElement, WebDriver, until } from 'selenium-webdriver';
 import { decrypt } from '../encrypt';
 import { BankAccountReader, BankAccountCrawler, BankTransaction, BankAccount } from '../types';
-import { config } from '../config';
+import { createDriver } from './driver';
 import * as dateFormat from 'dateformat';
 import logger from '../logger';
 
@@ -92,22 +89,7 @@ export const bomAccountReader = (driver: WebDriver, account: BankAccount): BankA
 
 export const bomCrawler = async (credentials: string): Promise<BankAccountCrawler> => {
   const { accessNumber, securityNumber, password }: BomCredentials = bomCredentialsReader(credentials);
-  const capabilities = Capabilities.chrome();
-  capabilities.set('chromeOptions', {
-    args: ['--headless', '--disable-gpu'],
-  });
-
-  const screen = {
-    width: 640,
-    height: 480
-  };
-
-  
-  const driver = await new Builder()
-    .forBrowser(config.browser)
-    .setChromeOptions(new chrome.Options().headless().windowSize(screen))
-    .withCapabilities(capabilities)
-    .build();
+  const driver = await createDriver();
 
   return {
     login: async (): Promise<void> => {

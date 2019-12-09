@@ -1,10 +1,9 @@
 require('chromedriver');
 import * as dateFormat from 'dateformat';
-import { Builder, By, Key, until } from 'selenium-webdriver';
-
+import { By } from 'selenium-webdriver';
+import { createDriver } from './driver';
 import { decrypt } from '../encrypt';
 import { BankAccountReader, BankAccountCrawler, BankTransaction, BankAccount } from '../types';
-import { config } from '../config';
 import logger from '../logger';
 
 const LOGIN_PAGE_URL = 'https://www.my.commbank.com.au/netbank/Logon/Logon.aspx';
@@ -48,7 +47,7 @@ export const cbaAccountReader = (driver: any): BankAccountReader => {
 
 export const cbaCrawler = async (credentials: string): Promise<BankAccountCrawler> => {
   const { memberNumber, password } : CbaCredentials = cbaCredentialReader(credentials);
-  const driver = await new Builder().forBrowser(config.browser).build();
+  const driver = await createDriver();
 
   return {
     login: async (): Promise<void> => {

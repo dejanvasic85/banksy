@@ -2,7 +2,7 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 export interface Config {
-  browser: string;
+  headlessBrowser: boolean;
   encryptionKey: string;
   mongoConnection: string;
   sumoLogicUrl: string;
@@ -15,7 +15,7 @@ export interface Config {
 }
 
 export const config: Config = {
-  browser: 'chrome',
+  headlessBrowser: process.env.HEADLESS_BROWSER === 'true',
   encryptionKey: process.env.ENCRYPTION_KEY,
   mongoConnection: process.env.MONGO_CONNECTION,
   sumoLogicUrl: process.env.SUMO_HTTP_URL,
