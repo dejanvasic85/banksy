@@ -1,11 +1,12 @@
 {
-  "name": "ynab-banksy",
+  "name": "banksy",
   "version": "1.0.0",
   "description": "",
   "main": "handler.js",
   "scripts": {
     "test": "mocha -r ts-node/register **/*-spec.ts",
-    "start": "ts-node ./src/index.ts"
+    "start": "ts-node ./src/index.ts",
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",
