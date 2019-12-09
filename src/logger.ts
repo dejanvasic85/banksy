@@ -24,16 +24,21 @@ const logger = createLogger({
 
     // Everything goes to console as well
     new transports.Console({ format: format.combine(format.colorize(), format.simple()) }),
+  ],
+});
 
+if (config.sumoLogicUrl) {
+  logger.transports.push(
+    // @ts-ignore
     new SumoLogic({
       url: config.sumoLogicUrl,
       interval: 5,
-      onError: async(err) => {
+      onError: async err => {
         // Just log it to the console
         console.log('sumo log error', err);
-      }
+      },
     }),
-  ],
-});
+  );
+}
 
 export default logger;
