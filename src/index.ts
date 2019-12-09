@@ -22,9 +22,10 @@ const start = async () => {
     }
 
     logger.on('finish', () => {
-      // Exit once the logs have been flushed
       process.exit(0);
     });
+    logger.info('Scrape completed successfully');
+    logger.end();
 
   } catch (err) {
     logger.error('Crash! Something went completely wrong.', err);
