@@ -20,7 +20,12 @@ const start = async () => {
         await processUser(userConfig);
       }
     }
-    process.exit(0);
+
+    logger.on('finish', () => {
+      // Exit once the logs have been flushed
+      process.exit(0);
+    });
+
   } catch (err) {
     logger.error('Crash! Something went completely wrong.', err);
     process.exit(1);
