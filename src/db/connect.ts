@@ -9,7 +9,7 @@ export const connect = async () : Promise<any> => {
     });
 
     connection.on('open', () => {
-      res('connected!');
+      res('Database Connected!');
     });
 
     mongoose.connect(config.mongoConnection, {

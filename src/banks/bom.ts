@@ -1,5 +1,7 @@
 require('chromedriver');
-import { Builder, By, WebElement, WebDriver, until } from 'selenium-webdriver';
+
+const chrome = require('selenium-webdriver/chrome');
+import { Builder, By, WebElement, WebDriver, until, Capabilities } from 'selenium-webdriver';
 import { decrypt } from '../encrypt';
 import { BankAccountReader, BankAccountCrawler, BankTransaction, BankAccount } from '../types';
 import { config } from '../config';
@@ -36,7 +38,7 @@ export const parseAmount = (debit: string, credit: string): number => {
   return isDebit ? -amount : amount;
 };
 
-const getTransactionRows = async (driver: WebDriver) : Promise<WebElement[]> => {
+const getTransactionRows = async (driver: WebDriver): Promise<WebElement[]> => {
   // Click on the "All" tab (this will be easier to fetch the transactions row below)
   await driver.findElement(By.css(`a[href="#transaction-all"]`)).click();
 
@@ -44,11 +46,11 @@ const getTransactionRows = async (driver: WebDriver) : Promise<WebElement[]> => 
   const items = await driver.wait(until.elementsLocated(By.css(`.clickable-trans`)));
 
   return items;
-}
+};
 
-const getPendingTransactionRows = async (driver: WebDriver) : Promise<WebElement[]> => {
+const getPendingTransactionRows = async (driver: WebDriver): Promise<WebElement[]> => {
   return await driver.findElements(By.css(`.transaction-pending > table > tbody > tr`));
-}
+};
 
 export const bomAccountReader = (driver: WebDriver, account: BankAccount): BankAccountReader => {
   return {
@@ -59,7 +61,7 @@ export const bomAccountReader = (driver: WebDriver, account: BankAccount): BankA
         ? await getPendingTransactionRows(driver)
         : await getTransactionRows(driver);
 
-      logger.info(`Found [${rows.length}] rows for account [${account.accountName}] `)
+      logger.info(`Found [${rows.length}] rows for account [${account.accountName}] `);
 
       for (const row of rows) {
         const columns = await row.findElements(By.css('td'));
@@ -74,7 +76,7 @@ export const bomAccountReader = (driver: WebDriver, account: BankAccount): BankA
         const description = await columns[2].getText();
         const amount = parseAmount(debit, credit);
         if (!amount) {
-          // The amount sometimes is an empty value! 
+          // The amount sometimes is an empty value!
           continue;
         }
 
@@ -90,7 +92,22 @@ export const bomAccountReader = (driver: WebDriver, account: BankAccount): BankA
 
 export const bomCrawler = async (credentials: string): Promise<BankAccountCrawler> => {
   const { accessNumber, securityNumber, password }: BomCredentials = bomCredentialsReader(credentials);
-  const driver = await new Builder().forBrowser(config.browser).build();
+  const capabilities = Capabilities.chrome();
+  capabilities.set('chromeOptions', {
+    args: ['--headless', '--disable-gpu'],
+  });
+
+  const screen = {
+    width: 640,
+    height: 480
+  };
+
+  
+  const driver = await new Builder()
+    .forBrowser(config.browser)
+    .setChromeOptions(new chrome.Options().headless().windowSize(screen))
+    .withCapabilities(capabilities)
+    .build();
 
   return {
     login: async (): Promise<void> => {
@@ -101,14 +118,13 @@ export const bomCrawler = async (credentials: string): Promise<BankAccountCrawle
       await driver.findElement(By.id('logonButton')).click();
     },
     getAccountReader: async (account: BankAccount): Promise<BankAccountReader> => {
-
       // Todo - press button to go home first and then click on the account!
       await driver.findElement(By.css(`a[href="viewAccountPortfolio.html"]`)).click();
 
       // <li> data-acctalias="Amplify Signature" > h2 > a click
       logger.info(`Clicking on account [${account.accountName}]`);
       await driver.findElement(By.css(`[data-acctalias="${account.accountName}"] > h2 > a`)).click();
-      
+
       return bomAccountReader(driver, account);
     },
     quit: async () => {
