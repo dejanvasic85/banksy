@@ -23,26 +23,20 @@ export const cbaCredentialReader = (key: string): CbaCredentials => {
 };
 
 const getAmount = async (row: WebElement): Promise<number> => {
-  const amountElements = await row.findElements(By.className('currencyUI'));
-  if (amountElements.length !== 1) {
-    logger.error('Found two elements with currencyUI class. Original row element:', row);
-    return null;
-  }
-
-  const element = amountElements[0];
-  const text = await element.getText();
+  const amountColumn = await row.findElements(By.className('align-right'))[0];
+  const currencyElement = await amountColumn.findElement(By.className('currencyUI'));
+  const text = await currencyElement.getText();
   if (text.length === 0) {
-    logger.error('Uhmmm there is no text in this amount element', element);
+    logger.error('Uhmmm there is no text in this amount element');
     return null;
   }
 
-  const classNames = await element.getAttribute('class');
   const amount = parseFloat(text.replace('$', '').replace(',', ''));
-
   if (Number.isNaN(amount)) {
     return null;
   }
 
+  const classNames = await currencyElement.getAttribute('class');
   return classNames.indexOf('currencyUIDebit') > 0
     ? -(amount)
     : amount;
