@@ -1,6 +1,6 @@
 require('chromedriver');
 import * as dateFormat from 'dateformat';
-import { By, WebDriver, until } from 'selenium-webdriver';
+import { By, WebElement, WebDriver, until } from 'selenium-webdriver';
 import { createDriver } from './driver';
 import { decrypt } from '../encrypt';
 import { BankAccountReader, BankAccountCrawler, BankTransaction, BankAccount } from '../types';
@@ -10,8 +10,8 @@ const LOGIN_PAGE_URL = 'https://www.my.commbank.com.au/netbank/Logon/Logon.aspx'
 const CBA_DATE_FORMAT = 'dd mmm yyyy';
 
 interface CbaCredentials {
-  memberNumber: string,
-  password: string,
+  memberNumber: string;
+  password: string;
 }
 
 export const cbaCredentialReader = (key: string): CbaCredentials => {
@@ -20,6 +20,32 @@ export const cbaCredentialReader = (key: string): CbaCredentials => {
     memberNumber,
     password,
   };
+};
+
+const getAmount = async (row: WebElement): Promise<number> => {
+  const amountElements = await row.findElements(By.className('currencyUI'));
+  if (amountElements.length !== 1) {
+    logger.error('Found two elements with currencyUI class. Original row element:', row);
+    return null;
+  }
+
+  const element = amountElements[0];
+  const text = await element.getText();
+  if (text.length === 0) {
+    logger.error('Uhmmm there is no text in this amount element', element);
+    return null;
+  }
+
+  const classNames = await element.getAttribute('class');
+  const amount = parseFloat(text.replace('$', '').replace(',', ''));
+
+  if (Number.isNaN(amount)) {
+    return null;
+  }
+
+  return classNames.indexOf('currencyUIDebit') > 0
+    ? -(amount)
+    : amount;
 };
 
 export const cbaAccountReader = (driver: WebDriver, account: BankAccount): BankAccountReader => {
@@ -32,10 +58,19 @@ export const cbaAccountReader = (driver: WebDriver, account: BankAccount): BankA
 
       for (const r of rows) {
         const date = await r.findElement(By.className('date')).getText();
+        const description = await r.findElement(By.className('original_description')).getText();
+        const amount = await getAmount(r);
+
         logger.info(`Comparing date netbank date ${date} to ${today}`);
 
         if (date === today) {
           logger.info('Found transaction');
+          const txn : BankTransaction = {
+            amount,
+            description
+          }
+
+          txns.push(txn);
         }
       }
 
@@ -45,7 +80,7 @@ export const cbaAccountReader = (driver: WebDriver, account: BankAccount): BankA
 };
 
 export const cbaCrawler = async (credentials: string): Promise<BankAccountCrawler> => {
-  const { memberNumber, password } : CbaCredentials = cbaCredentialReader(credentials);
+  const { memberNumber, password }: CbaCredentials = cbaCredentialReader(credentials);
   const driver = await createDriver();
 
   return {
