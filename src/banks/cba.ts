@@ -22,21 +22,38 @@ export const cbaCredentialReader = (key: string): CbaCredentials => {
   };
 };
 
+const parseTextToAmount = (text: string) : number => {
+  const cleaned = text
+    .trim()
+    .replace(' ', '')
+    .replace('$', '')
+    .replace('-', '')
+    .replace('+', '')
+    .replace(',', '');
+
+  return parseFloat(cleaned);
+}
+
 const getAmount = async (row: WebElement): Promise<number> => {
-  const amountColumn = await row.findElements(By.className('align-right'))[0];
+  const columns = await row.findElements(By.css('td'));
+  const amountColumn = columns[3];
   const currencyElement = await amountColumn.findElement(By.className('currencyUI'));
   const text = await currencyElement.getText();
+
   if (text.length === 0) {
     logger.error('Uhmmm there is no text in this amount element');
     return null;
   }
 
-  const amount = parseFloat(text.replace('$', '').replace(',', ''));
+  const amount = parseTextToAmount(text);
   if (Number.isNaN(amount)) {
     return null;
   }
 
   const classNames = await currencyElement.getAttribute('class');
+
+  logger.info('classNames');
+
   return classNames.indexOf('currencyUIDebit') > 0
     ? -(amount)
     : amount;
@@ -54,8 +71,6 @@ export const cbaAccountReader = (driver: WebDriver, account: BankAccount): BankA
         const date = await r.findElement(By.className('date')).getText();
         const description = await r.findElement(By.className('original_description')).getText();
         const amount = await getAmount(r);
-
-        logger.info(`Comparing date netbank date ${date} to ${today}`);
 
         if (date === today) {
           logger.info('Found transaction');
