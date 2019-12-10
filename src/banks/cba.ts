@@ -52,8 +52,6 @@ const getAmount = async (row: WebElement): Promise<number> => {
 
   const classNames = await currencyElement.getAttribute('class');
 
-  logger.info('classNames');
-
   return classNames.indexOf('currencyUIDebit') > 0
     ? -(amount)
     : amount;
