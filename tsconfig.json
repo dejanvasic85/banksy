@@ -2,8 +2,12 @@
   "compilerOptions": {
     "outDir": "./dist",
     "allowJs": true,
-    "target": "es5",
-    "noImplicitReturns": true
+    "noImplicitReturns": true,
+    "lib": ["es2017"],
+    "removeComments": true,
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "target": "es2017",
   },
   "include": [
     "./src/**/*"
