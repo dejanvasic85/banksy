@@ -1,6 +1,4 @@
 import { createLogger, transports, format } from 'winston';
-import { config } from './config';
-import { SumoLogic } from 'winston-sumologic-transport';
 
 const logger = createLogger({
   level: 'info',
@@ -26,19 +24,5 @@ const logger = createLogger({
     new transports.Console({ format: format.combine(format.colorize(), format.simple()) }),
   ],
 });
-
-if (config.sumoLogicUrl) {
-  logger.transports.push(
-    // @ts-ignore
-    new SumoLogic({
-      url: config.sumoLogicUrl,
-      interval: 5,
-      onError: async err => {
-        // Just log it to the console
-        console.log('sumo log error', err);
-      },
-    }),
-  );
-}
 
 export default logger;

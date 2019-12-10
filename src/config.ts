@@ -5,7 +5,6 @@ export interface Config {
   headlessBrowser: boolean;
   encryptionKey: string;
   mongoConnection: string;
-  sumoLogicUrl: string;
   useLocalSecrets: boolean;
   users: [
     {
@@ -19,7 +18,6 @@ export const config: Config = {
   headlessBrowser: process.env.HEADLESS_BROWSER === 'true',
   encryptionKey: process.env.ENCRYPTION_KEY,
   mongoConnection: process.env.MONGO_CONNECTION,
-  sumoLogicUrl: process.env.SUMO_HTTP_URL,
   useLocalSecrets: process.env.USE_LOCAL_SECRETS === 'true',
   users: [
     {
