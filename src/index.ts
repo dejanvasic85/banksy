@@ -20,17 +20,15 @@ const start = async () => {
         await processUser(userConfig);
       }
     }
-
-    logger.on('finish', () => {
-      process.exit(0);
-    });
-    logger.info('Scrape completed successfully');
-    logger.end();
-
   } catch (err) {
     logger.error('Crash! Something went completely wrong.', err);
-    process.exit(1);
   }
+
+  logger.on('finish', () => {
+    process.exit(0);
+  });
+  
+  logger.end();
 };
 
 start();
