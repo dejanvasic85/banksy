@@ -2,10 +2,48 @@ import { bankAccountFactory } from './bankAccountFactory';
 import { getTransactions, updateTransactions } from './db/userTransactionRepository';
 import { reconcile } from './reconciler';
 import logger from './logger';
-import { UserConfig, TransactionsMessage } from './types';
+import { UserConfig, TransactionsMessage, BankAccount, BankAccountCrawler } from './types';
 import { publish } from './publisher';
 
-export const processUser = async ({ user, banks, publisherConfig }: UserConfig): Promise<void> => {
+export const processBankAccount = async (
+  account: BankAccount,
+  bankCrawler: BankAccountCrawler,
+  userConfig: UserConfig,
+  bankId: string,
+): Promise<void> => {
+  try {
+    logger.info(`bankAccountProcessor: Processing account ${account.accountName}`);
+    const { accountName } = account;
+    const accountReader = await bankCrawler.getAccountReader(account);
+    const now = new Date();
+
+    const cached = await getTransactions({
+      date: now,
+      bankId,
+      accountName,
+      user: userConfig.user,
+    });
+
+    const bankTransactions = await accountReader.getTodaysTransactions();
+    const newTransactions = reconcile({ cachedTransactions: cached.transactions, bankTransactions });
+
+    if (newTransactions.length > 0) {
+      logger.info(`bankAccountProcessor: New Transactions. Found total of ${newTransactions.length}`);
+      await updateTransactions(cached._id, newTransactions);
+      const message: TransactionsMessage = {
+        bankId: bankId,
+        accountName,
+        transactions: newTransactions,
+      };
+      await publish(userConfig.publisherConfig, message);
+    }
+  } catch (err) {
+    logger.error('An error occurred while processing. ', err);
+  }
+};
+
+export const processUser = async (userConfig: UserConfig): Promise<void> => {
+  const { user, banks, publisherConfig } = userConfig;
   for (const bankConfig of banks) {
     const accounts = bankConfig.accounts.filter(a => a.active);
 
@@ -38,18 +76,17 @@ export const processUser = async ({ user, banks, publisherConfig }: UserConfig):
 
         const bankTransactions = await accountReader.getTodaysTransactions();
         const newTransactions = reconcile({ cachedTransactions: cached.transactions, bankTransactions });
-        
+
         if (newTransactions.length > 0) {
           logger.info(`bankAccountProcessor: New Transactions. Found total of ${newTransactions.length}`);
           await updateTransactions(cached._id, newTransactions);
-          const message : TransactionsMessage = {
+          const message: TransactionsMessage = {
             bankId: bankConfig.bankId,
             accountName,
-            transactions: newTransactions 
+            transactions: newTransactions,
           };
           await publish(publisherConfig, message);
         }
-        
       } catch (err) {
         logger.error('An error occurred while processing. ', err);
       }

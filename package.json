@@ -4,7 +4,7 @@
   "description": "",
   "main": "handler.js",
   "scripts": {
-    "test": "mocha -r ts-node/register **/*-spec.ts",
+    "test": "mocha -r ts-node/register ./src/*-spec.ts",
     "start": "ts-node ./src/index.ts",
     "build": "tsc"
   },
