@@ -9,15 +9,15 @@ const clean = str =>
     .replace(' ', '')
     .toLowerCase();
 
-export const createKey = (date: Date, bankId: string, accountName: string, user: string) => {
+export const createKey = (date: Date, bankId: string, accountName: string, username: string) => {
   const dateStr = dateFormat(date, 'yyyymmdd');
-  return `${dateStr}-${clean(bankId)}-${clean(accountName)}-${clean(user)}`;
+  return `${dateStr}-${clean(bankId)}-${clean(accountName)}-${clean(username)}`;
 };
 
 // Example:
 // const data = await getTransactions({ date: today, bankId: 'cba', accountName: 'smart-access', user: 'dejan '})
-export const getTransactions = async ({ date, bankId, accountName, user }) => {
-  const key = createKey(date, bankId, accountName, user);
+export const getTransactions = async ({ date, bankId, accountName, username }) => {
+  const key = createKey(date, bankId, accountName, username);
 
   logger.info(`userTransactionRepository. Fetching transactions for ${key}`);
   const todaysTransactions = await UserTransactions.findById(key);

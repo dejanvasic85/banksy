@@ -12,12 +12,11 @@ const start = async () => {
     const result = await connect();
 
     logger.info(result);
-    for (const userData of config.users) {
-      const { secretKey } = userData;
-      const userSecret = await getSecret(secretKey);
+    for (const username of config.users) {
+      const userSecret = await getSecret(username);
       if (userSecret) {
         const userConfig: UserConfig = JSON.parse(userSecret);
-        await processUser(userConfig);
+        await processUser(username, userConfig);
       }
     }
   } catch (err) {
@@ -27,7 +26,7 @@ const start = async () => {
   logger.on('finish', () => {
     process.exit(0);
   });
-  
+
   logger.end();
 };
 

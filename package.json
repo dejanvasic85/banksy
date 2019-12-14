@@ -1,10 +1,10 @@
 {
   "name": "banksy",
   "version": "1.0.0",
-  "description": "",
+  "description": "Bank transaction fetcher using selenium and publishing to SNS topic",
   "main": "handler.js",
   "scripts": {
-    "test": "mocha -r ts-node/register ./src/*-spec.ts",
+    "test": "mocha -r ts-node/register ./src/**/*-spec.ts",
     "start": "ts-node ./src/index.ts",
     "build": "tsc"
   },

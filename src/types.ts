@@ -1,3 +1,15 @@
+export interface Config {
+  awsAccessKey: string;
+  awsAccessSecret: string;
+  awsAccessRegion: string;
+  logGroupStreamName: string;
+  headlessBrowser: boolean;
+  encryptionKey: string;
+  mongoConnection: string;
+  useLocalSecrets: boolean;
+  users: string[];
+}
+
 export interface BankAccount {
   accountName: string;
   active: boolean;
@@ -20,7 +32,6 @@ export interface Publisher {
 }
 
 export interface UserConfig {
-  user: string;
   banks: Bank[];
   publisherConfig: PublisherConfig;
 }
@@ -41,6 +52,7 @@ export interface BankTransaction {
 }
 
 export interface TransactionsMessage {
+  username: string;
   bankId: string;
   accountName: string;
   transactions: BankTransaction[];

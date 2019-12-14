@@ -1,22 +1,8 @@
 import * as dotenv from 'dotenv';
-dotenv.config();
+import { Config } from './types';
 
-export interface Config {
-  awsAccessKey: string;
-  awsAccessSecret: string;
-  awsAccessRegion: string;
-  logGroupStreamName: string;
-  headlessBrowser: boolean;
-  encryptionKey: string;
-  mongoConnection: string;
-  useLocalSecrets: boolean;
-  users: [
-    {
-      user: string;
-      secretKey: string;
-    },
-  ];
-}
+// Initialise environment variables by reading the .env file locally (if any)
+dotenv.config();
 
 export const config: Config = {
   awsAccessKey: process.env.AWS_ACCESS_KEY_ID,
@@ -27,10 +13,5 @@ export const config: Config = {
   encryptionKey: process.env.ENCRYPTION_KEY,
   mongoConnection: process.env.MONGO_CONNECTION,
   useLocalSecrets: process.env.USE_LOCAL_SECRETS === 'true',
-  users: [
-    {
-      user: 'dejan',
-      secretKey: 'dejan-cba',
-    },
-  ],
+  users: process.env.USERS.split(','),
 };

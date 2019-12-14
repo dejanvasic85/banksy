@@ -7,17 +7,17 @@ const client = new SecretsManager({
   region: 'ap-southeast-2',
 });
 
-export const getSecret = async (name: string): Promise<string> => {
-  logger.info(`Fetching secret [${name}] please wait...`);
+export const getSecret = async (secretName: string): Promise<string> => {
+  logger.info(`Fetching secret [${secretName}] please wait...`);
 
   if (config.useLocalSecrets) {
-    const fileName = `secret-${name}.json`;
+    const fileName = `secret-${secretName}.json`;
     const data = readFileSync(fileName, 'utf8');
     return data;
   }
 
   try {
-    const data = await client.getSecretValue({ SecretId: name }).promise();
+    const data = await client.getSecretValue({ SecretId: secretName }).promise();
     return data.SecretString;
   } catch (err) {
     logger.error(`Failed fetching secret.`, err);
