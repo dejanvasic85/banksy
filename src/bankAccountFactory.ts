@@ -1,5 +1,6 @@
 import { cbaCrawler } from './banks/cba';
 import { bomCrawler } from './banks/bom';
+import { westpacCrawler } from './banks/westpac';
 import { BankAccountCrawler } from './types';
 
 export const bankAccountFactory = async ({ bankId, credentials }) : Promise<BankAccountCrawler>  => {
@@ -9,6 +10,9 @@ export const bankAccountFactory = async ({ bankId, credentials }) : Promise<Bank
     }
     case 'bom': {
       return await bomCrawler(credentials);
+    }
+    case 'westpac': {
+      return await westpacCrawler(credentials);
     }
 
     default: {

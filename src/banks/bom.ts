@@ -110,7 +110,6 @@ export const bomCrawler = async (credentials: string): Promise<BankAccountCrawle
       return bomAccountReader(driver, account);
     },
     quit: async () => {
-      // Todo - use selenium to close the browser;
       await driver.quit();
     },
   };

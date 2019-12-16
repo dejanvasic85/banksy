@@ -74,7 +74,7 @@ export const cbaAccountReader = (driver: WebDriver, account: BankAccount): BankA
           logger.info('Found transaction');
           const txn : BankTransaction = {
             amount,
-            description
+            description: description.substr(0, 100)
           }
 
           txns.push(txn);
@@ -107,7 +107,6 @@ export const cbaCrawler = async (credentials: string): Promise<BankAccountCrawle
       return cbaAccountReader(driver, account);
     },
     quit: async () => {
-      // Todo - use selenium to close the browser;
       await driver.quit();
     },
   };
