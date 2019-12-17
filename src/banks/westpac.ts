@@ -6,6 +6,8 @@ import { decrypt } from '../encrypt';
 import { BankAccountReader, BankAccountCrawler, BankTransaction, BankAccount } from '../types';
 import logger from '../logger';
 
+const CBA_DATE_FORMAT = 'dd mmm yyyy';
+
 const LOGIN_PAGE_URL =
   'https://banking.westpac.com.au/wbc/banking/handler?TAM_OP=login&URL=%2Fsecure%2Fbanking%2Foverview%2Fdashboard&logout=false';
 
@@ -14,9 +16,19 @@ interface WestpacCredentials {
   password: string;
 }
 
+const parseTextToAmount = (text: string) : number => {
+  const cleaned = text
+    .trim()
+    .replace('$', '');
+
+  return parseFloat(cleaned);
+}
+
 const pause = (ms: number): Promise<void> => {
   return new Promise(res => setTimeout(res, ms));
 };
+
+const today = dateFormat(new Date(), CBA_DATE_FORMAT);
 
 export const westpacCredentialReader = (key: string): WestpacCredentials => {
   const [customerId, password] = decrypt(key).split('|');
@@ -29,8 +41,26 @@ export const westpacCredentialReader = (key: string): WestpacCredentials => {
 export const westpacAccountReader = (driver: WebDriver, account: BankAccount): BankAccountReader => {
   return {
     getTodaysTransactions: async (): Promise<BankTransaction[]> => {
-      await pause(10000);
-      const txns = [];
+      logger.info('Getting transactions...');
+      const txns : BankTransaction[] = [];
+      const rowElements = await driver.wait(until.elementsLocated(By.css('tbody > tr')));
+
+      for (const row of rowElements) {
+        const columns = await row.findElements(By.css('td'));
+        const date = await columns[0].getText();
+        const descriptionSpan = await columns[2].findElement(By.css('span'));
+        const description = await descriptionSpan.getText();
+        const amountSpan = await columns[3].findElement(By.css('span'));
+        const amountText = await amountSpan.getText();
+
+        txns.push({
+          amount: parseTextToAmount(amountText),
+          description
+        });
+      }
+      
+      logger.info('Found Transactions', txns);
+
       // Todo - coming soon
       return txns;
     },

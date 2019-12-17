@@ -57,25 +57,25 @@ const getAmount = async (row: WebElement): Promise<number> => {
     : amount;
 };
 
-export const cbaAccountReader = (driver: WebDriver, account: BankAccount): BankAccountReader => {
+export const cbaAccountReader = (driver: WebDriver, { accountName }: BankAccount): BankAccountReader => {
   return {
     getTodaysTransactions: async (): Promise<BankTransaction[]> => {
       const txns = [];
       const today = dateFormat(new Date(), CBA_DATE_FORMAT);
       const rows = await driver.wait(until.elementsLocated(By.css('[data-issynced]')));
-      logger.info(`Found [${rows.length}] rows for account [${account.accountName}] `);
-
+      
       for (const r of rows) {
         const date = await r.findElement(By.className('date')).getText();
         const description = await r.findElement(By.className('original_description')).getText();
         const amount = await getAmount(r);
 
         if (date === today) {
-          logger.info('Found transaction');
           const txn : BankTransaction = {
             amount,
             description: description.substr(0, 100)
           }
+
+          logger.info(`Found transaction Account: ${accountName} Amount: ${amount}, Description: ${description}`);
 
           txns.push(txn);
         }
