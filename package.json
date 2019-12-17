@@ -4,7 +4,7 @@
   "description": "Bank transaction fetcher using selenium and publishing to SNS topic",
   "main": "handler.js",
   "scripts": {
-    "test": "mocha -r ts-node/register ./src/**/*-spec.ts",
+    "test": "mocha -r ts-node/register ./test/*-spec.ts",
     "start": "ts-node ./src/index.ts",
     "build": "tsc",
     "credentials": "ts-node ./src/generateCredentials.ts"

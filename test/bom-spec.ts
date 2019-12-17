@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { parseAmount } from './bom';
+import { parseAmount } from '../src/banks/bom';
 
 describe('bom', () => {
   describe('parseAmount', () => {

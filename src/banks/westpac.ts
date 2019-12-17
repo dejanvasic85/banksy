@@ -8,7 +8,6 @@ import logger from '../logger';
 
 const LOGIN_PAGE_URL =
   'https://banking.westpac.com.au/wbc/banking/handler?TAM_OP=login&URL=%2Fsecure%2Fbanking%2Foverview%2Fdashboard&logout=false';
-const CBA_DATE_FORMAT = 'dd mmm yyyy';
 
 interface WestpacCredentials {
   customerId: string;
@@ -46,7 +45,6 @@ export const westpacCrawler = async (credentials: string): Promise<BankAccountCr
       await driver.get(LOGIN_PAGE_URL);
       await driver.findElement(By.id('fakeusername')).sendKeys(customerId);
       await driver.findElement(By.id('password')).sendKeys(password);
-      await pause(3000);
       await driver.findElement(By.id('signin')).click();
     },
 

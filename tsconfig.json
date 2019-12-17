@@ -10,6 +10,6 @@
     "target": "es2017",
   },
   "include": [
-    "./src/**/*"
+    "./src/**/*", "test/bom-spec.ts", "test/cba-spec.ts", "test/reconciler-spec.ts"
   ]
 }

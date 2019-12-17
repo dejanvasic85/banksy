@@ -1,4 +1,4 @@
-const { reconcile } = require('./reconciler');
+const { reconcile } = require('../src/reconciler');
 const { expect } = require('chai');
 
 describe('reconcile', () => {
