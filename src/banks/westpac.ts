@@ -14,9 +14,9 @@ interface WestpacCredentials {
   password: string;
 }
 
-const pause = (ms: number) : Promise<void> => {
+const pause = (ms: number): Promise<void> => {
   return new Promise(res => setTimeout(res, ms));
-}
+};
 
 export const westpacCredentialReader = (key: string): WestpacCredentials => {
   const [customerId, password] = decrypt(key).split('|');
@@ -29,6 +29,7 @@ export const westpacCredentialReader = (key: string): WestpacCredentials => {
 export const westpacAccountReader = (driver: WebDriver, account: BankAccount): BankAccountReader => {
   return {
     getTodaysTransactions: async (): Promise<BankTransaction[]> => {
+      await pause(10000);
       const txns = [];
       // Todo - coming soon
       return txns;
@@ -49,13 +50,23 @@ export const westpacCrawler = async (credentials: string): Promise<BankAccountCr
     },
 
     getAccountReader: async (account: BankAccount): Promise<BankAccountReader> => {
-      await pause(12000);
-      // const homeLink = await driver.wait(until.elementLocated(By.linkText('My home')));
-      // await homeLink.click();
+      const homeLink = await driver.wait(until.elementLocated(By.css('#logo a')));
+      await homeLink.click();
 
-      // const link = await driver.wait(until.elementLocated(By.linkText(account.accountName)));
-      // await link.click();
+      const accountLinks = await driver.wait(until.elementsLocated(By.css('.tiles h2')));
+      let link = null;
+      for (const linkElement of accountLinks) {
+        const text = await linkElement.getText();
+        if (text.trim() !== account.accountName.trim()) {
+          link = linkElement;
+          break;
+        }
+      }
 
+      if (!link) {
+        throw new Error(`Unable to locate the account link ${account.accountName}`);
+      }
+      await link.click();
       return westpacAccountReader(driver, account);
     },
 
