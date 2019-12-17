@@ -21,7 +21,10 @@ export const publishToSns = async (topicArn, message: TransactionsMessage): Prom
 
   try {
     await sns.publish(params).promise();
-    logger.info(`Published messages to ${topicArn} successfully.`);
+    logger.info(`Published messagee to ${topicArn} successfully.`, {
+      message
+    });
+    
     return true;
   } catch (err) {
     logger.error('Could not publish message.', err);
