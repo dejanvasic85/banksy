@@ -77,10 +77,14 @@ export const bomAccountReader = (driver: WebDriver, account: BankAccount): BankA
           continue;
         }
 
-        txns.push({
-          amount,
-          description,
-        });
+        const txn : BankTransaction = {
+          amount, 
+          description
+        };
+
+        logger.info(`Found transaction Account: ${account.accountName} Amount: ${amount}, Description: ${description}`);
+
+        txns.push(txn);
       }
       return txns;
     },
