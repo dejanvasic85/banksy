@@ -9,6 +9,8 @@ import logger from '../logger';
 const LOGIN_PAGE_URL = 'https://www.my.commbank.com.au/netbank/Logon/Logon.aspx';
 const CBA_DATE_FORMAT = 'dd mmm yyyy';
 
+const today = dateFormat(new Date(), CBA_DATE_FORMAT);
+
 interface CbaCredentials {
   memberNumber: string;
   password: string;
@@ -22,7 +24,7 @@ export const cbaCredentialReader = (key: string): CbaCredentials => {
   };
 };
 
-const parseTextToAmount = (text: string) : number => {
+const parseTextToAmount = (text: string): number => {
   const cleaned = text
     .trim()
     .replace(' ', '')
@@ -32,7 +34,7 @@ const parseTextToAmount = (text: string) : number => {
     .replace(',', '');
 
   return parseFloat(cleaned);
-}
+};
 
 const getAmount = async (row: WebElement): Promise<number> => {
   const columns = await row.findElements(By.css('td'));
@@ -52,28 +54,26 @@ const getAmount = async (row: WebElement): Promise<number> => {
 
   const classNames = await currencyElement.getAttribute('class');
 
-  return classNames.indexOf('currencyUIDebit') > 0
-    ? -(amount)
-    : amount;
+  return classNames.indexOf('currencyUIDebit') > 0 ? -amount : amount;
 };
 
 export const cbaAccountReader = (driver: WebDriver, { accountName }: BankAccount): BankAccountReader => {
   return {
     getTodaysTransactions: async (): Promise<BankTransaction[]> => {
       const txns = [];
-      const today = dateFormat(new Date(), CBA_DATE_FORMAT);
+
       const rows = await driver.wait(until.elementsLocated(By.css('[data-issynced]')));
-      
+
       for (const r of rows) {
         const date = await r.findElement(By.className('date')).getText();
         const description = await r.findElement(By.className('original_description')).getText();
         const amount = await getAmount(r);
 
         if (date === today) {
-          const txn : BankTransaction = {
+          const txn: BankTransaction = {
             amount,
-            description: description.substr(0, 100)
-          }
+            description: description.substr(0, 100),
+          };
 
           logger.info(`Found transaction Account: ${accountName} Amount: ${amount}, Description: ${description}`);
 

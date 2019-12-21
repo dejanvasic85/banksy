@@ -49,6 +49,7 @@ export interface BankAccountCrawler {
 export interface BankTransaction {
   amount: number;
   description: string;
+  date?: string;
 }
 
 export interface TransactionsMessage {

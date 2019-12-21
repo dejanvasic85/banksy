@@ -6,7 +6,9 @@ import { decrypt } from '../encrypt';
 import { BankAccountReader, BankAccountCrawler, BankTransaction, BankAccount } from '../types';
 import logger from '../logger';
 
-const CBA_DATE_FORMAT = 'dd mmm yyyy';
+const DATE_FORMAT = 'dd mmm yyyy';
+
+const today = dateFormat(new Date(), DATE_FORMAT);
 
 const LOGIN_PAGE_URL =
   'https://banking.westpac.com.au/wbc/banking/handler?TAM_OP=login&URL=%2Fsecure%2Fbanking%2Foverview%2Fdashboard&logout=false';
@@ -28,8 +30,6 @@ const pause = (ms: number): Promise<void> => {
   return new Promise(res => setTimeout(res, ms));
 };
 
-const today = dateFormat(new Date(), CBA_DATE_FORMAT);
-
 export const westpacCredentialReader = (key: string): WestpacCredentials => {
   const [customerId, password] = decrypt(key).split('|');
   return {
@@ -47,21 +47,26 @@ export const westpacAccountReader = (driver: WebDriver, account: BankAccount): B
 
       for (const row of rowElements) {
         const columns = await row.findElements(By.css('td'));
-        const date = await columns[0].getText();
-        const descriptionSpan = await columns[2].findElement(By.css('span'));
+        const dateSpan = await columns[0].findElement(By.css('span'));
+        const date = await dateSpan.getText();
+
+        // if (today !== date) {
+        //   continue;
+        // }
+
+        const descriptionSpan = await row.findElement(By.css('span[data-bind="text: Description"]'));
         const description = await descriptionSpan.getText();
-        const amountSpan = await columns[3].findElement(By.css('span'));
+
+        const amountSpan = await row.findElement(By.css('span[data-bind="html: Amount"]'));
         const amountText = await amountSpan.getText();
 
         txns.push({
+          date,
           amount: parseTextToAmount(amountText),
           description
         });
       }
       
-      logger.info('Found Transactions', txns);
-
-      // Todo - coming soon
       return txns;
     },
   };
@@ -87,7 +92,7 @@ export const westpacCrawler = async (credentials: string): Promise<BankAccountCr
       let link = null;
       for (const linkElement of accountLinks) {
         const text = await linkElement.getText();
-        if (text.trim() !== account.accountName.trim()) {
+        if (text.trim() === account.accountName.trim()) {
           link = linkElement;
           break;
         }
