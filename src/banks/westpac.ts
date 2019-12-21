@@ -50,9 +50,9 @@ export const westpacAccountReader = (driver: WebDriver, account: BankAccount): B
         const dateSpan = await columns[0].findElement(By.css('span'));
         const date = await dateSpan.getText();
 
-        // if (today !== date) {
-        //   continue;
-        // }
+        if (today !== date) {
+          continue;
+        }
 
         const descriptionSpan = await row.findElement(By.css('span[data-bind="text: Description"]'));
         const description = await descriptionSpan.getText();
