@@ -81,7 +81,7 @@ export const cbaAccountReader = (driver: WebDriver, { accountName }: BankAccount
         txns.push({
           amount,
           description: description.substr(0, 100),
-          date: parsedDate.toISOString(),
+          date: parsedDate.format(),
         });
       }
 

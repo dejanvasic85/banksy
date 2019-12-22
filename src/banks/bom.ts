@@ -91,7 +91,7 @@ export const bomAccountReader = (driver: WebDriver, account: BankAccount): BankA
         const txn: BankTransaction = {
           amount,
           description,
-          date: parsedDate.toISOString(),
+          date: parsedDate.format(),
         };
 
         logger.info(`Found transaction for comparison ${date} ${amount} ${description}`);

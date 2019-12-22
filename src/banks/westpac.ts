@@ -67,7 +67,7 @@ export const westpacAccountReader = (driver: WebDriver, account: BankAccount): B
         logger.info(`Found transaction for comparison ${dateText} ${amountText} ${description}`);
         txns.push({
           amount: parseTextToAmount(amountText),
-          date: parsedDate.toISOString(),
+          date: parsedDate.format(),
           description
         });
       }
