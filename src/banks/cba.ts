@@ -73,10 +73,11 @@ export const cbaAccountReader = (driver: WebDriver, { accountName }: BankAccount
         const today = moment();
 
         if (today.startOf('day').isAfter(parsedDate)) {
-          logger.info(`Transaction is is a past date: [${date}]`);
           continue;
         }
 
+        logger.info(`Found transaction for comparison ${date} ${amount} ${description}`);
+        
         txns.push({
           amount,
           description: description.substr(0, 100),

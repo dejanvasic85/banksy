@@ -35,9 +35,9 @@ export const parseAmount = (debit: string, credit: string): number => {
   return isDebit ? -amount : amount;
 };
 
-export const parseDate = (text: string) : moment.Moment => {
+export const parseDate = (text: string): moment.Moment => {
   return moment(text, BOM_DATE_FORMAT);
-}
+};
 
 const getTransactionRows = async (driver: WebDriver): Promise<WebElement[]> => {
   // Click on the "All" tab (this will be easier to fetch the transactions row below)
@@ -65,12 +65,16 @@ export const bomAccountReader = (driver: WebDriver, account: BankAccount): BankA
 
       for (const row of rows) {
         const columns = await row.findElements(By.css('td'));
+
+        if (columns.length < 5) {
+          continue;
+        }
+
         const date = await columns[0].getText();
         const parsedDate = parseDate(date);
         const today = moment();
 
         if (today.startOf('day').isAfter(parsedDate)) {
-          logger.info(`Transaction is is a past date: [${date}]`);
           continue;
         }
 
@@ -78,19 +82,19 @@ export const bomAccountReader = (driver: WebDriver, account: BankAccount): BankA
         const credit = await columns[4].getText();
         const description = await columns[2].getText();
         const amount = parseAmount(debit, credit);
-        
+
         if (!amount) {
           // The amount sometimes is an empty value!
           continue;
         }
 
-        const txn : BankTransaction = {
-          amount, 
+        const txn: BankTransaction = {
+          amount,
           description,
-          date
+          date: parsedDate.toISOString(),
         };
 
-        logger.info(`Found transaction Account: ${account.accountName} Amount: ${amount}, Description: ${description}`);
+        logger.info(`Found transaction for comparison ${date} ${amount} ${description}`);
 
         txns.push(txn);
       }
