@@ -1,14 +1,12 @@
 require('chromedriver');
-import * as dateFormat from 'dateformat';
-import { By, WebElement, WebDriver, until } from 'selenium-webdriver';
+import { By, WebDriver, until } from 'selenium-webdriver';
 import { createDriver } from './driver';
 import { decrypt } from '../encrypt';
 import { BankAccountReader, BankAccountCrawler, BankTransaction, BankAccount } from '../types';
 import logger from '../logger';
+import * as moment from 'moment';
 
-const DATE_FORMAT = 'dd mmm yyyy';
-
-const today = dateFormat(new Date(), DATE_FORMAT);
+const DATE_FORMAT = 'DD MMM YYYY';
 
 const LOGIN_PAGE_URL =
   'https://banking.westpac.com.au/wbc/banking/handler?TAM_OP=login&URL=%2Fsecure%2Fbanking%2Foverview%2Fdashboard&logout=false';
@@ -30,6 +28,10 @@ const pause = (ms: number): Promise<void> => {
   return new Promise(res => setTimeout(res, ms));
 };
 
+export const parseDate = (date: string) : moment.Moment => {
+  return moment(date, DATE_FORMAT);
+}
+
 export const westpacCredentialReader = (key: string): WestpacCredentials => {
   const [customerId, password] = decrypt(key).split('|');
   return {
@@ -40,7 +42,7 @@ export const westpacCredentialReader = (key: string): WestpacCredentials => {
 
 export const westpacAccountReader = (driver: WebDriver, account: BankAccount): BankAccountReader => {
   return {
-    getTodaysTransactions: async (): Promise<BankTransaction[]> => {
+    getBankTransactions: async (): Promise<BankTransaction[]> => {
       logger.info('Getting transactions...');
       const txns : BankTransaction[] = [];
       const rowElements = await driver.wait(until.elementsLocated(By.css('tbody > tr')));
@@ -48,9 +50,11 @@ export const westpacAccountReader = (driver: WebDriver, account: BankAccount): B
       for (const row of rowElements) {
         const columns = await row.findElements(By.css('td'));
         const dateSpan = await columns[0].findElement(By.css('span'));
-        const date = await dateSpan.getText();
+        const dateText = await dateSpan.getText();
+        const parsedDate = parseDate(dateText);
+        const today = moment();
 
-        if (today !== date) {
+        if (today.startOf('day').isAfter(parsedDate)) {
           continue;
         }
 
@@ -60,9 +64,10 @@ export const westpacAccountReader = (driver: WebDriver, account: BankAccount): B
         const amountSpan = await row.findElement(By.css('span[data-bind="html: Amount"]'));
         const amountText = await amountSpan.getText();
 
+        logger.info(`Found transaction for comparison ${dateText} ${amountText} ${description}`);
         txns.push({
-          date,
           amount: parseTextToAmount(amountText),
+          date: parsedDate.toISOString(),
           description
         });
       }

@@ -1,12 +1,12 @@
 import { SNS } from 'aws-sdk';
-import { BankTransaction, PublisherConfig, TransactionsMessage } from './types';
+import { PublisherConfig, TransactionsMessage } from './types';
 import logger from './logger';
 
 export const publish = async (config: PublisherConfig, message: TransactionsMessage): Promise<boolean> => {
   switch (config.type) {
     case 'sns':
       return await publishToSns(config.address, message);
-    default: 
+    default:
       throw new Error('Unsupported publisher config');
   }
 };
@@ -20,14 +20,13 @@ export const publishToSns = async (topicArn, message: TransactionsMessage): Prom
   };
 
   try {
+    logger.info(
+      `Publishing to ${topicArn}. Details: ${message.bankId} ${message.accountName} ${message.username}. Transactions count [${message.transactions.length}]`,
+    );
     await sns.publish(params).promise();
-    logger.info(`Published messagee to ${topicArn} successfully.`, {
-      message
-    });
-    
     return true;
   } catch (err) {
     logger.error('Could not publish message.', err);
     return false;
   }
-}; 
+};

@@ -1,5 +1,5 @@
 require('chromedriver');
-import * as dateFormat from 'dateformat';
+import * as moment from 'moment';
 import { By, WebElement, WebDriver, until } from 'selenium-webdriver';
 import { createDriver } from './driver';
 import { decrypt } from '../encrypt';
@@ -7,9 +7,7 @@ import { BankAccountReader, BankAccountCrawler, BankTransaction, BankAccount } f
 import logger from '../logger';
 
 const LOGIN_PAGE_URL = 'https://www.my.commbank.com.au/netbank/Logon/Logon.aspx';
-const CBA_DATE_FORMAT = 'dd mmm yyyy';
-
-const today = dateFormat(new Date(), CBA_DATE_FORMAT);
+const CBA_DATE_FORMAT = 'DD MMM YYYY';
 
 interface CbaCredentials {
   memberNumber: string;
@@ -36,6 +34,10 @@ const parseTextToAmount = (text: string): number => {
   return parseFloat(cleaned);
 };
 
+const parseDate = (text: string): moment.Moment => {
+  return moment(text, CBA_DATE_FORMAT);
+};
+
 const getAmount = async (row: WebElement): Promise<number> => {
   const columns = await row.findElements(By.css('td'));
   const amountColumn = columns[3];
@@ -53,32 +55,33 @@ const getAmount = async (row: WebElement): Promise<number> => {
   }
 
   const classNames = await currencyElement.getAttribute('class');
-
   return classNames.indexOf('currencyUIDebit') > 0 ? -amount : amount;
 };
 
 export const cbaAccountReader = (driver: WebDriver, { accountName }: BankAccount): BankAccountReader => {
   return {
-    getTodaysTransactions: async (): Promise<BankTransaction[]> => {
+    getBankTransactions: async (): Promise<BankTransaction[]> => {
       const txns = [];
 
       const rows = await driver.wait(until.elementsLocated(By.css('[data-issynced]')));
 
       for (const r of rows) {
         const date = await r.findElement(By.className('date')).getText();
+        const parsedDate = parseDate(date);
         const description = await r.findElement(By.className('original_description')).getText();
         const amount = await getAmount(r);
+        const today = moment();
 
-        if (date === today) {
-          const txn: BankTransaction = {
-            amount,
-            description: description.substr(0, 100),
-          };
-
-          logger.info(`Found transaction Account: ${accountName} Amount: ${amount}, Description: ${description}`);
-
-          txns.push(txn);
+        if (today.startOf('day').isAfter(parsedDate)) {
+          logger.info(`Transaction is is a past date: [${date}]`);
+          continue;
         }
+
+        txns.push({
+          amount,
+          description: description.substr(0, 100),
+          date: parsedDate.toISOString(),
+        });
       }
 
       return txns;

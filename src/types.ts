@@ -37,7 +37,7 @@ export interface UserConfig {
 }
 
 export interface BankAccountReader {
-  getTodaysTransactions(): Promise<BankTransaction[]>;
+  getBankTransactions(): Promise<BankTransaction[]>;
 }
 
 export interface BankAccountCrawler {
@@ -49,7 +49,7 @@ export interface BankAccountCrawler {
 export interface BankTransaction {
   amount: number;
   description: string;
-  date?: string;
+  date: string;
 }
 
 export interface TransactionsMessage {

@@ -37,7 +37,7 @@ export const processUser = async (username: string, userConfig: UserConfig): Pro
           username,
         });
 
-        const bankTransactions = await accountReader.getTodaysTransactions();
+        const bankTransactions = await accountReader.getBankTransactions();
         const newTransactions = reconcile({ cachedTransactions: cached.transactions, bankTransactions });
 
         if (newTransactions.length > 0) {

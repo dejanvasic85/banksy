@@ -30,7 +30,7 @@ const logger = createLogger({
       logStreamName: config.logGroupStreamName,
       createLogGroup: true,
       createLogStream: true,
-      submissionInterval: 1000,
+      submissionInterval: 500,
       submissionRetryCount: 2,
       batchSize: 1,
       awsConfig: {

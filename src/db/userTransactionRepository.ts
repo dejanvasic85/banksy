@@ -1,7 +1,7 @@
 import { UserTransactions } from './userTransactions';
-import * as dateFormat from 'dateformat';
 import logger from '../logger';
 import { BankTransaction } from '../types';
+import * as moment from 'moment';
 
 const clean = str =>
   str
@@ -10,12 +10,11 @@ const clean = str =>
     .toLowerCase();
 
 export const createKey = (date: Date, bankId: string, accountName: string, username: string) => {
-  const dateStr = dateFormat(date, 'yyyymmdd');
+  // Monthly cache
+  const dateStr = moment(date).format('YYYYMM');
   return `${dateStr}-${clean(bankId)}-${clean(accountName)}-${clean(username)}`;
 };
 
-// Example:
-// const data = await getTransactions({ date: today, bankId: 'cba', accountName: 'smart-access', user: 'dejan '})
 export const getTransactions = async ({ date, bankId, accountName, username }) => {
   const key = createKey(date, bankId, accountName, username);
 
@@ -25,20 +24,14 @@ export const getTransactions = async ({ date, bankId, accountName, username }) =
     return todaysTransactions;
   }
 
-  // Create default document for today with empty txns
-  var today = dateFormat((new Date(), 'yyyymmdd'));
   const newData = {
     _id: key,
-    date: today,
     transactions: [],
   };
 
   return await UserTransactions.create(newData);
 };
 
-// Example:
-// const txn = { description: 'cool dude', amount: -100 };
-// const data = await updateTransactions(data, [txn]);
 export const updateTransactions = async (id: string, txns: BankTransaction[]) => {
   await UserTransactions.findByIdAndUpdate(id, {
     $push: {

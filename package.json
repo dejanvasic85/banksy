@@ -5,6 +5,8 @@
   "main": "handler.js",
   "scripts": {
     "test": "mocha -r ts-node/register ./test/*-spec.ts",
+    "test:westpac": "mocha -r ts-node/register ./integration-test/westpac-spec.ts",
+    "test:single": "mocha -r ts-node/register ./test/$test*spec.ts --watch-extensions ts --w",
     "start": "ts-node ./src/index.ts",
     "build": "tsc",
     "credentials": "ts-node ./src/generateCredentials.ts"
@@ -17,8 +19,8 @@
     "aws-sdk": "^2.573.0",
     "chromedriver": "^79.0.0",
     "cryptr": "^6.0.1",
-    "dateformat": "^3.0.3",
     "dotenv": "^8.2.0",
+    "moment": "^2.24.0",
     "mongoose": "^5.7.12",
     "selenium-webdriver": "^4.0.0-alpha.5",
     "winston": "^3.2.1",
