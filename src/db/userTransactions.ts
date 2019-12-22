@@ -4,10 +4,11 @@ const userTransactionSchema = new Schema({
   _id: String,
   transactions: [
     {
+      amount: Number,
+      date: String,
       description: String,
-      amount: Number
-    }
-  ]
+    },
+  ],
 });
 
 const UserTransactions = model('UserTransactions', userTransactionSchema);
