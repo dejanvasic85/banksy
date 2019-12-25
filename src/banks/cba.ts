@@ -2,6 +2,7 @@ require('chromedriver');
 import * as moment from 'moment';
 import { By, WebElement, WebDriver, until } from 'selenium-webdriver';
 import { createDriver } from './driver';
+import { screenshotToDisk } from '../selenium';
 import { decrypt } from '../encrypt';
 import { BankAccountReader, BankAccountCrawler, BankTransaction, BankAccount } from '../types';
 import logger from '../logger';
@@ -113,5 +114,8 @@ export const cbaCrawler = async (credentials: string): Promise<BankAccountCrawle
     quit: async () => {
       await driver.quit();
     },
+    screenshot: async () => {
+      await screenshotToDisk(`cba-${Date.now()}`, driver);
+    }
   };
 };

@@ -2,6 +2,7 @@ require('chromedriver');
 import { By, WebDriver, until } from 'selenium-webdriver';
 import { createDriver } from './driver';
 import { decrypt } from '../encrypt';
+import { screenshotToDisk } from '../selenium';
 import { BankAccountReader, BankAccountCrawler, BankTransaction, BankAccount } from '../types';
 import logger from '../logger';
 import * as moment from 'moment';
@@ -16,21 +17,19 @@ interface WestpacCredentials {
   password: string;
 }
 
-const parseTextToAmount = (text: string) : number => {
-  const cleaned = text
-    .trim()
-    .replace('$', '');
+const parseTextToAmount = (text: string): number => {
+  const cleaned = text.trim().replace('$', '');
 
   return parseFloat(cleaned);
-}
+};
 
 const pause = (ms: number): Promise<void> => {
   return new Promise(res => setTimeout(res, ms));
 };
 
-export const parseDate = (date: string) : moment.Moment => {
+export const parseDate = (date: string): moment.Moment => {
   return moment(date, DATE_FORMAT);
-}
+};
 
 export const westpacCredentialReader = (key: string): WestpacCredentials => {
   const [customerId, password] = decrypt(key).split('|');
@@ -44,7 +43,7 @@ export const westpacAccountReader = (driver: WebDriver, account: BankAccount): B
   return {
     getBankTransactions: async (): Promise<BankTransaction[]> => {
       logger.info('Getting transactions...');
-      const txns : BankTransaction[] = [];
+      const txns: BankTransaction[] = [];
       const rowElements = await driver.wait(until.elementsLocated(By.css('tbody > tr')));
 
       for (const row of rowElements) {
@@ -68,10 +67,10 @@ export const westpacAccountReader = (driver: WebDriver, account: BankAccount): B
         txns.push({
           amount: parseTextToAmount(amountText),
           date: parsedDate.format(),
-          description
+          description,
         });
       }
-      
+
       return txns;
     },
   };
@@ -112,6 +111,9 @@ export const westpacCrawler = async (credentials: string): Promise<BankAccountCr
 
     quit: async () => {
       await driver.quit();
+    },
+    screenshot: async () => {
+      await screenshotToDisk(`westpac-${Date.now()}`, driver);
     },
   };
 };

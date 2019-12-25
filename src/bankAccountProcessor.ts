@@ -5,8 +5,7 @@ import logger from './logger';
 import { UserConfig, TransactionsMessage } from './types';
 import { publish } from './publisher';
 
-export const processUser = async (username: string, userConfig: UserConfig): Promise<void> => {
-  const { banks, publisherConfig } = userConfig;
+export const processUser = async (username: string, { banks, publisherConfig }: UserConfig): Promise<void> => {
   for (const bankConfig of banks) {
     const accounts = bankConfig.accounts.filter(a => a.active);
 
@@ -52,6 +51,7 @@ export const processUser = async (username: string, userConfig: UserConfig): Pro
           await publish(publisherConfig, message);
         }
       } catch (err) {
+        await bankCrawler.screenshot();
         logger.error('An error occurred while processing. ', err);
       }
     }

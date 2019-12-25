@@ -2,6 +2,7 @@ import { By, WebElement, WebDriver, until } from 'selenium-webdriver';
 import { decrypt } from '../encrypt';
 import { BankAccountReader, BankAccountCrawler, BankTransaction, BankAccount } from '../types';
 import { createDriver } from './driver';
+import { screenshotToDisk } from '../selenium';
 import * as moment from 'moment';
 import logger from '../logger';
 
@@ -128,5 +129,8 @@ export const bomCrawler = async (credentials: string): Promise<BankAccountCrawle
     quit: async () => {
       await driver.quit();
     },
+    screenshot: async () => {
+      await screenshotToDisk(`bom-${Date.now()}`, driver);
+    }
   };
 };

@@ -41,6 +41,7 @@ export interface BankAccountReader {
 }
 
 export interface BankAccountCrawler {
+  screenshot();
   login(): Promise<void>;
   getAccountReader(account: BankAccount): Promise<BankAccountReader>;
   quit(): Promise<void>;
