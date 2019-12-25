@@ -1,8 +1,7 @@
 require('chromedriver');
 import * as moment from 'moment';
 import { By, WebElement, WebDriver, until } from 'selenium-webdriver';
-import { createDriver } from './driver';
-import { screenshotToDisk } from '../selenium';
+import { createDriver, screenshotToDisk } from '../selenium';
 import { decrypt } from '../encrypt';
 import { BankAccountReader, BankAccountCrawler, BankTransaction, BankAccount } from '../types';
 import logger from '../logger';

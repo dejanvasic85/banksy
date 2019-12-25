@@ -1,7 +1,28 @@
-import { WebDriver } from "selenium-webdriver";
+require('chromedriver');
+import * as chrome from 'selenium-webdriver/chrome';
+import { Builder, WebDriver } from 'selenium-webdriver';
+import { config } from './config';
 import { writeFileSync } from 'fs';
+import logger from './logger';
 
-export const screenshotToDisk = async (imgName: string, driver : WebDriver) : Promise<void> => {
+export const createDriver = async (): Promise<WebDriver> => {
+  const screen = {
+    width: 1200,
+    height: 1000,
+  };
+
+  const builder = await new Builder().forBrowser('chrome');
+  const chromeOptions = new chrome.Options().windowSize(screen);
+
+  if (config.headlessBrowser) {
+    logger.info('Using headless browser.');
+    chromeOptions.headless();
+  }
+
+  return builder.setChromeOptions(chromeOptions).build();
+};
+
+export const screenshotToDisk = async (imgName: string, driver: WebDriver): Promise<void> => {
   const img = await driver.takeScreenshot();
-  writeFileSync(`${imgName}.png`, img, 'base64');
-}
+  writeFileSync(`./screenshots/${imgName}.png`, img, 'base64');
+};

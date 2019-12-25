@@ -1,8 +1,7 @@
 import { By, WebElement, WebDriver, until } from 'selenium-webdriver';
 import { decrypt } from '../encrypt';
 import { BankAccountReader, BankAccountCrawler, BankTransaction, BankAccount } from '../types';
-import { createDriver } from './driver';
-import { screenshotToDisk } from '../selenium';
+import { createDriver, screenshotToDisk } from '../selenium';
 import * as moment from 'moment';
 import logger from '../logger';
 
