@@ -59,3 +59,10 @@ export interface TransactionsMessage {
   accountName: string;
   transactions: BankTransaction[];
 }
+
+export interface ColumnIndexes {
+  dateIndex: number;
+  descriptionIndex: number;
+  debitIndex: number;
+  creditIndex: number;
+}

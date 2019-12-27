@@ -5,8 +5,8 @@
   "main": "handler.js",
   "scripts": {
     "test": "mocha -r ts-node/register ./test/*-spec.ts",
-    "test:westpac": "mocha -r ts-node/register ./integration-test/westpac-spec.ts",
-    "test:single": "mocha -r ts-node/register ./test/$test*spec.ts --watch-extensions ts --w",
+    "test:integration": "mocha -r ts-node/register ./integration-tests/*.ts",
+    "test:single": "mocha -r ts-node/register ./test/$test*-spec.ts --watch-extensions ts --w",
     "start": "ts-node ./src/index.ts",
     "build": "tsc",
     "credentials": "ts-node ./src/generateCredentials.ts"

@@ -26,3 +26,12 @@ export const screenshotToDisk = async (imgName: string, driver: WebDriver): Prom
   const img = await driver.takeScreenshot();
   writeFileSync(`./screenshots/${imgName}.png`, img, 'base64');
 };
+
+export const textContains = (text: string, textToCompare: string): boolean => {
+  return (
+    text
+      .trim()
+      .toLowerCase()
+      .indexOf(textToCompare.trim().toLowerCase()) >= 0
+  );
+};
