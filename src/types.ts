@@ -13,7 +13,6 @@ export interface Config {
 export interface BankAccount {
   accountName: string;
   active: boolean;
-  pendingTransactionsOnly?: boolean;
 }
 
 export interface Bank {
