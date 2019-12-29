@@ -68,7 +68,8 @@ export const cbaAccountReader = (driver: WebDriver, { accountName }: BankAccount
       for (const r of rows) {
         const date = await r.findElement(By.className('date')).getText();
         const parsedDate = parseDate(date);
-        const description = await r.findElement(By.className('original_description')).getText();
+        const descriptionElement = await r.findElement(By.css('.original_description'));
+        const description = (await descriptionElement.getAttribute('innerHTML')).replace('<br>', ' ');
         const amount = await getAmount(r);
 
         if (!parsedDate.isValid()) {
