@@ -72,119 +72,64 @@ const getColumnIndexesFromHeadingRow = async (row: WebElement): Promise<ColumnIn
   };
 };
 
-const getHistoryTableTransactions = async (driver: WebDriver): Promise<BankTransaction[]> => {
-  const headingRows = await driver.findElements(By.css('#txnHistoryTable thead tr'));
+const getTransactions = async (
+  driver: WebDriver,
+  headingSelector: string,
+  rowSelector: string,
+): Promise<BankTransaction[]> => {
+  const headingRows = await driver.findElements(By.css(headingSelector));
   if (headingRows.length === 0) {
     logger.info('Heading rows cannot be found');
     return [];
   }
 
   const indexes = await getColumnIndexesFromHeadingRow(headingRows[0]);
-  if (!indexes) {
-    logger.info('Heading indexes cannot be parsed', { indexes });
+  if (indexes === null) {
+    logger.info('Unable to get the column indexes');
     return [];
   }
 
-  const rows = await driver.findElements(By.css('#txnHistoryTable tbody tr'));
+  const { dateIndex, debitIndex, creditIndex, descriptionIndex } = indexes;
+  const rows = await driver.findElements(By.css(rowSelector));
 
-  return Promise.all(
-    rows
-      .map(async (r: WebElement) => {
-        const columns = await r.findElements(By.css('td'));
-        // if (columns.length < indexes.dateIndex) {
-        //   return null;
-        // }
+  const txns = await Promise.all(
+    rows.map(async (r: WebElement) => {
+      const columns = await r.findElements(By.css('td'));
+      const dateText = await columns[dateIndex].getText();
+      const parsedDate = parseDate(dateText);
+      const descriptionText = await columns[descriptionIndex].getText();
 
-        // const dateText = parseDate(await columns[indexes.dateIndex].getText()).format();
+      if (!dateText || !descriptionText || !parsedDate.isValid()) {
+        return null;
+      }
 
-        return {
-          date: parseDate(await columns[indexes.dateIndex].getText()).format(),
-          amount: await parseAmountFromColumns(columns[indexes.debitIndex], columns[indexes.creditIndex]),
-          description: await columns[indexes.descriptionIndex].getText(),
-        };
-      })
-      .filter(Boolean),
+      return {
+        date: parsedDate.format(),
+        amount: await parseAmountFromColumns(columns[debitIndex], columns[creditIndex]),
+        description: descriptionText,
+      };
+    }),
   );
+
+  return txns.filter(Boolean);
 };
-
-const getPendingTransactionRows = async (driver: WebDriver): Promise<WebElement[]> => {
-  return await driver.findElements(By.css(`.transaction-pending > table > tbody > tr`));
-};
-
-// const getPendingTransactionRows = async (driver: WebDriver): Promise<BankTransaction[]> => {
-//   const rows = await driver.findElements(By.css(`.transaction-pending > table > tbody > tr`));
-
-//   return Promise.all(
-//     rows
-//       .map(async (r: WebElement) => {
-//         const columns = await r.findElements(By.css('td'));
-//         if (columns.length < 5) {
-//           return null;
-//         }
-
-//         return {
-//           date: parseDate(await columns[0].getText()).format(),
-//           amount: await parseAmountFromColumns(columns[3], columns[4]),
-//           description: await columns[2].getText(),
-//         };
-//       })
-//       .filter(Boolean),
-//   );
-// };
 
 export const bomAccountReader = (driver: WebDriver, account: BankAccount): BankAccountReader => {
   return {
     getBankTransactions: async (): Promise<BankTransaction[]> => {
-      return await getHistoryTableTransactions(driver);
-    },
+      const historyTableTransactions = await getTransactions(
+        driver,
+        '#txnHistoryTable thead tr',
+        '#txnHistoryTable tbody tr',
+      );
 
-    // @ts-ignore
-    getBankTransactionsOld: async (): Promise<BankTransaction[]> => {
-      const txns = [];
-      // const rows = account.pendingTransactionsOnly
-      //   ? await getPendingTransactionRows(driver)
-      //   : await getTransactionRows(driver);
+      const pendingTableTransactions = await getTransactions(
+        driver,
+        '.transaction-pending table thead tr',
+        '.transaction-pending table tbody tr',
+      );
 
-      const rows = await getPendingTransactionRows(driver);
-
-      logger.info(`Found [${rows.length}] rows for account [${account.accountName}] `);
-
-      for (const row of rows) {
-        const columns = await row.findElements(By.css('td'));
-
-        if (columns.length < 5) {
-          continue;
-        }
-
-        const date = await columns[0].getText();
-        const parsedDate = parseDate(date);
-        //const today = moment();
-
-        // if (today.startOf('day').isAfter(parsedDate)) {
-        //   continue;
-        // }
-
-        const debit = await columns[3].getText();
-        const credit = await columns[4].getText();
-        const description = await columns[2].getText();
-        const amount = parseAmount(debit, credit);
-
-        if (!amount) {
-          // The amount sometimes is an empty value!
-          continue;
-        }
-
-        const txn: BankTransaction = {
-          amount,
-          description,
-          date: parsedDate.format(),
-        };
-
-        logger.info(`Found transaction for comparison ${date} ${amount} ${description}`);
-
-        txns.push(txn);
-      }
-      return txns;
+      return [...historyTableTransactions, ...pendingTableTransactions];
     },
   };
 };
