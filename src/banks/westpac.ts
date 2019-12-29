@@ -62,7 +62,6 @@ export const westpacAccountReader = (driver: WebDriver, account: BankAccount): B
         const amountSpan = await row.findElement(By.css('span[data-bind="html: Amount"]'));
         const amountText = await amountSpan.getText();
 
-        logger.info(`Found transaction for comparison ${dateText} ${amountText} ${description}`);
         txns.push({
           amount: parseTextToAmount(amountText),
           date: parsedDate.format(),

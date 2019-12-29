@@ -76,8 +76,6 @@ export const cbaAccountReader = (driver: WebDriver, { accountName }: BankAccount
           continue;
         }
 
-        logger.info(`Found transaction for comparison ${date} ${amount} ${description}`);
-
         txns.push({
           amount,
           description: description.substr(0, 100),
