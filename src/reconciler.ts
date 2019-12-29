@@ -1,6 +1,8 @@
 import { BankTransaction } from './types';
+import * as moment from 'moment';
 
 export interface ReconcileParams {
+  startOfMonth: moment.Moment;
   cachedTransactions: BankTransaction[];
   bankTransactions: BankTransaction[];
 }
@@ -10,10 +12,18 @@ const areEqual = (existingTxn: BankTransaction, accountTxn: BankTransaction) => 
     return false;
   }
 
-  return existingTxn.amount === accountTxn.amount && existingTxn.description === accountTxn.description;
+  return (
+    existingTxn.amount === accountTxn.amount &&
+    existingTxn.description === accountTxn.description &&
+    existingTxn.date === accountTxn.date
+  );
 };
 
-export const reconcile = ({ cachedTransactions, bankTransactions }: ReconcileParams): BankTransaction[] => {
+export const reconcile = ({
+  startOfMonth,
+  cachedTransactions,
+  bankTransactions,
+}: ReconcileParams): BankTransaction[] => {
   if (bankTransactions.length === 0) {
     return [];
   }
@@ -22,6 +32,8 @@ export const reconcile = ({ cachedTransactions, bankTransactions }: ReconcilePar
     // return all
     return bankTransactions;
   }
-
-  return bankTransactions.filter(bt => !cachedTransactions.some(tt => areEqual(tt, bt)));
+console.log('start of month', startOfMonth.format());
+  return bankTransactions
+    .filter(({ date }) => moment(date).isAfter(startOfMonth))
+    .filter(bt => !cachedTransactions.some(tt => areEqual(tt, bt)));
 };

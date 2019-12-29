@@ -11,7 +11,7 @@ describe('selenium', () => {
     ];
 
     tests.forEach(testCase => {
-      it(`should return ${testCase.expected} for text ${testCase.textToCompare} when text is ${testCase.text}`, () => {
+      it(`should return ${testCase.expected} for text ${testCase.text} when text is ${testCase.textToCompare}`, () => {
         expect(textContains(testCase.text, testCase.textToCompare)).to.equal(testCase.expected);
       });
     });

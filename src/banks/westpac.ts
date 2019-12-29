@@ -50,9 +50,9 @@ export const westpacAccountReader = (driver: WebDriver, account: BankAccount): B
         const dateSpan = await columns[0].findElement(By.css('span'));
         const dateText = await dateSpan.getText();
         const parsedDate = parseDate(dateText);
-        const today = moment();
 
-        if (today.startOf('day').isAfter(parsedDate)) {
+        if (!parsedDate.isValid()) {
+          logger.warn(`Unable to parse date for transaction. Text: ${dateText}`);
           continue;
         }
 

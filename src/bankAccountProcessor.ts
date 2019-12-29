@@ -4,6 +4,7 @@ import { reconcile } from './reconciler';
 import logger from './logger';
 import { UserConfig, TransactionsMessage } from './types';
 import { publish } from './publisher';
+import { getStartOfMonth } from './startOfMonth';
 
 export const processUser = async (username: string, { banks, publisherConfig }: UserConfig): Promise<void> => {
   for (const bankConfig of banks) {
@@ -37,7 +38,11 @@ export const processUser = async (username: string, { banks, publisherConfig }: 
         });
 
         const bankTransactions = await accountReader.getBankTransactions();
-        const newTransactions = reconcile({ cachedTransactions: cached.transactions, bankTransactions });
+        const newTransactions = reconcile({
+          cachedTransactions: cached.transactions,
+          bankTransactions,
+          startOfMonth: getStartOfMonth(),
+        });
 
         if (newTransactions.length > 0) {
           logger.info(`bankAccountProcessor: New Transactions. Found total of ${newTransactions.length}`);

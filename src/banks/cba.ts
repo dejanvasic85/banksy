@@ -70,14 +70,14 @@ export const cbaAccountReader = (driver: WebDriver, { accountName }: BankAccount
         const parsedDate = parseDate(date);
         const description = await r.findElement(By.className('original_description')).getText();
         const amount = await getAmount(r);
-        const today = moment();
 
-        if (today.startOf('day').isAfter(parsedDate)) {
+        if (!parsedDate.isValid()) {
+          logger.warn(`Unable to parse date for transaction. Text: ${date}`);
           continue;
         }
 
         logger.info(`Found transaction for comparison ${date} ${amount} ${description}`);
-        
+
         txns.push({
           amount,
           description: description.substr(0, 100),
@@ -115,6 +115,6 @@ export const cbaCrawler = async (credentials: string): Promise<BankAccountCrawle
     },
     screenshot: async () => {
       await screenshotToDisk(`cba-${Date.now()}`, driver);
-    }
+    },
   };
 };
