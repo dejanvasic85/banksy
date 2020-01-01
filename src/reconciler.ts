@@ -34,6 +34,6 @@ export const reconcile = ({
   }
 console.log('start of month', startOfMonth.format());
   return bankTransactions
-    .filter(({ date }) => moment(date).isAfter(startOfMonth))
+    .filter(({ date }) => moment(date).isSameOrAfter(startOfMonth))
     .filter(bt => !cachedTransactions.some(tt => areEqual(tt, bt)));
 };
