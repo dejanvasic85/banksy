@@ -58,10 +58,15 @@ describe('reconcile', () => {
           date: '2019-11-29T00:00:00+11:00', // ignore older date (last month)
         },
         {
-          // everything is the same
+          // everything is the same (ignore)
           amount: 300,
           description: 'target',
           date: '2019-12-28T00:00:00+11:00',
+        },
+        {
+          amount: 444,
+          description: 'zonzos',
+          date: startOfMonth.format(), // older transaction but same or after start of month
         },
       ],
     });
@@ -81,6 +86,11 @@ describe('reconcile', () => {
         amount: 100,
         description: 'mcdonalds',
         date: '2019-12-27T00:00:00+11:00',
+      },
+      {
+        amount: 444,
+        description: 'zonzos',
+        date: startOfMonth.format(),
       },
     ]);
   });

@@ -32,7 +32,7 @@ export const reconcile = ({
     // return all
     return bankTransactions;
   }
-console.log('start of month', startOfMonth.format());
+
   return bankTransactions
     .filter(({ date }) => moment(date).isSameOrAfter(startOfMonth))
     .filter(bt => !cachedTransactions.some(tt => areEqual(tt, bt)));
