@@ -60,12 +60,12 @@ describe('reconcile', () => {
         {
           // everything is the same (ignore)
           amount: 300,
-          description: 'target',
+          description: 'PENDING -   TARGET',
           date: '2019-12-28T00:00:00+11:00',
         },
         {
           amount: 444,
-          description: 'zonzos',
+          description: 'Zoo',
           date: startOfMonth.format(), // older transaction but same or after start of month
         },
       ],
@@ -89,7 +89,7 @@ describe('reconcile', () => {
       },
       {
         amount: 444,
-        description: 'zonzos',
+        description: 'Zoo',
         date: startOfMonth.format(),
       },
     ]);

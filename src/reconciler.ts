@@ -7,6 +7,15 @@ export interface ReconcileParams {
   bankTransactions: BankTransaction[];
 }
 
+const clean = (str: string): string => {
+  if (!str) return '';
+  return str
+    .toLowerCase()
+    .replace('pending', '')
+    .replace('-', '')
+    .trim();
+};
+
 const areEqual = (existingTxn: BankTransaction, accountTxn: BankTransaction) => {
   if (!existingTxn || !accountTxn) {
     return false;
@@ -14,7 +23,7 @@ const areEqual = (existingTxn: BankTransaction, accountTxn: BankTransaction) => 
 
   return (
     existingTxn.amount === accountTxn.amount &&
-    existingTxn.description === accountTxn.description &&
+    clean(existingTxn.description) === clean(accountTxn.description) &&
     existingTxn.date === accountTxn.date
   );
 };
