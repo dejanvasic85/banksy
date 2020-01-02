@@ -79,13 +79,13 @@ const getTransactions = async (
 ): Promise<BankTransaction[]> => {
   const headingRows = await driver.findElements(By.css(headingSelector));
   if (headingRows.length === 0) {
-    logger.warn('Heading rows cannot be found');
+    logger.warn(`Heading rows cannot be found for selector ${headingSelector}`);
     return [];
   }
 
   const indexes = await getColumnIndexesFromHeadingRow(headingRows[0]);
   if (indexes === null) {
-    logger.warn('Unable to get the column indexes');
+    logger.warn(`Unable to get the column indexes for selector ${rowSelector}`);
     return [];
   }
 
