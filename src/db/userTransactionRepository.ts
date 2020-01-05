@@ -20,10 +20,11 @@ export const getTransactions = async ({ date, bankId, accountName, username }) =
 
   logger.info(`userTransactionRepository. Fetching transactions for ${key}`);
   const todaysTransactions = await UserTransactions.findById(key);
+  
   if (todaysTransactions) {
     return todaysTransactions;
   }
-
+  
   const newData = {
     _id: key,
     transactions: [],

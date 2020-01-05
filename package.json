@@ -15,7 +15,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/selenium-webdriver": "^4.0.5",
     "aws-sdk": "^2.573.0",
     "chromedriver": "^79.0.0",
     "cryptr": "^6.0.1",
@@ -29,6 +28,8 @@
   "devDependencies": {
     "@types/chai": "4.2.7",
     "@types/mocha": "5.2.7",
+    "@types/mongoose": "^5.5.38",
+    "@types/selenium-webdriver": "^4.0.5",
     "chai": "4.2.0",
     "mocha": "6.2.2",
     "password-prompt": "1.1.2",

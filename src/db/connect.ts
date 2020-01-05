@@ -4,6 +4,7 @@ import { config } from '../config';
 export const connect = async () : Promise<any> => {
   return new Promise((res, rej) => {
     const connection = mongoose.connection;
+    
     connection.on('error', () => {
       rej('Mongo refused to connect. Check connection string.');
     });
