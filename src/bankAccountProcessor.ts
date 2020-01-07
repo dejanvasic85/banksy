@@ -17,6 +17,7 @@ export const processBankAccount = async (
     logger.info(`bankAccountProcessor: Processing account ${account.accountName}`);
     const { accountName } = account;
     const accountReader = await bankCrawler.getAccountReader(account);
+    
     const now = new Date();
 
     const cached = await getTransactions({

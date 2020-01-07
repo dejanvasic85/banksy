@@ -1,4 +1,4 @@
-import { Schema, Connection } from 'mongoose';
+import { Schema } from 'mongoose';
 import { UserTransactionsModel } from '../types';
 import { connect } from './connect';
 
