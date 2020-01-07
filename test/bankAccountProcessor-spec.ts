@@ -32,7 +32,7 @@ describe('bankAccountProcessor', () => {
   let reconcileStub: any;
   let startOfMonthStub: any;
   let getBankTransactionsStub: any;
-  let publishToSnsStub: any;
+  let publishStub: any;
   let loggerErrorStub: any;
   let loggerInfoStub;
 
@@ -57,7 +57,7 @@ describe('bankAccountProcessor', () => {
     updateTransactionsStub = stub(userRepository, 'updateTransactions');
     reconcileStub = stub(reconciler, 'reconcile');
     startOfMonthStub = stub(startOfMonth, 'getStartOfMonth');
-    publishToSnsStub = stub(publisher, 'publishToSns');
+    publishStub = stub(publisher, 'publish');
     loggerErrorStub = stub(logger, 'error');
     loggerInfoStub = stub(logger, 'info');
   });
@@ -70,7 +70,7 @@ describe('bankAccountProcessor', () => {
     reconcileStub.resetHistory();
     startOfMonthStub.resetHistory();
     getBankTransactionsStub.resetHistory();
-    publishToSnsStub.resetHistory();
+    publishStub.resetHistory();
     loggerErrorStub.resetHistory();
     loggerInfoStub.resetHistory();
     bankCrawlerStub.screenshot.resetHistory();
@@ -85,7 +85,7 @@ describe('bankAccountProcessor', () => {
     updateTransactionsStub.restore();
     reconcileStub.restore();
     startOfMonthStub.restore();
-    publishToSnsStub.restore();
+    publishStub.restore();
     loggerErrorStub.restore();
     loggerInfoStub.restore();
   });
@@ -145,7 +145,7 @@ describe('bankAccountProcessor', () => {
         expect(getTransactionsStub.called).to.equal(true);
         expect(getBankTransactionsStub.called).to.equal(true);
         expect(updateTransactionsStub.called).to.equal(false);
-        expect(publishToSnsStub.called).to.equal(false);
+        expect(publishStub.called).to.equal(false);
       });
     });
 
@@ -158,9 +158,51 @@ describe('bankAccountProcessor', () => {
 
         expect(getBankTransactionsStub.called).to.equal(false);
         expect(updateTransactionsStub.called).to.equal(false);
-        expect(publishToSnsStub.called).to.equal(false);
+        expect(publishStub.called).to.equal(false);
         expect(bankCrawlerStub.screenshot.called).to.equal(true);
         expect(loggerErrorStub.getCall(0).args).to.eql(['An error occurred while processing.', accountReadErr]);
+      });
+    });
+
+    describe('when the reconciler finds new transactions', () => {
+      it('should call the publisher', async () => {
+        const newTransactions = [
+          {
+            amount: 2,
+            date: 'yesterday',
+            description: 'kfc',
+          },
+        ];
+
+        getBankTransactionsStub.resolves(newTransactions);
+
+        getTransactionsStub.resolves({
+          _id: 'cached-key',
+          transactions: [
+            {
+              amount: 1,
+              date: 'today',
+              description: 'mcdonalds',
+            },
+          ],
+        });
+
+        reconcileStub.returns(newTransactions);
+
+        await bankAccountProcessor.processBankAccount(username, bankId, account, bankCrawlerStub, publisherConfig);
+
+        expect(updateTransactionsStub.called).to.equal(true);
+        expect(publishStub.called).to.equal(true);
+        expect(publishStub.getCall(0).args).to.eql([publisherConfig, {
+          accountName: 'bankAccount',
+          bankId: 'bank321',
+          username: 'user123',
+          transactions: [{
+            amount: 2,
+            date: 'yesterday',
+            description: 'kfc'
+          }]
+        }]);
       });
     });
   });
