@@ -7,6 +7,7 @@ import * as userRepository from '../src/db/userTransactionRepository';
 import * as reconciler from '../src/reconciler';
 import * as startOfMonth from '../src/startOfMonth';
 import * as publisher from '../src/publisher';
+import logger from '../src/logger';
 
 const baseUserConfig: any = {
   banks: [
@@ -32,6 +33,8 @@ describe('bankAccountProcessor', () => {
   let startOfMonthStub: any;
   let getBankTransactionsStub: any;
   let publishToSnsStub: any;
+  let loggerErrorStub: any;
+  let loggerInfoStub;
 
   before(() => {
     bankCrawlerStub = {
@@ -54,7 +57,9 @@ describe('bankAccountProcessor', () => {
     updateTransactionsStub = stub(userRepository, 'updateTransactions');
     reconcileStub = stub(reconciler, 'reconcile');
     startOfMonthStub = stub(startOfMonth, 'getStartOfMonth');
-    publishToSnsStub = stub(publisher, 'publishToSns')
+    publishToSnsStub = stub(publisher, 'publishToSns');
+    loggerErrorStub = stub(logger, 'error');
+    loggerInfoStub = stub(logger, 'info');
   });
 
   beforeEach(() => {
@@ -66,6 +71,12 @@ describe('bankAccountProcessor', () => {
     startOfMonthStub.resetHistory();
     getBankTransactionsStub.resetHistory();
     publishToSnsStub.resetHistory();
+    loggerErrorStub.resetHistory();
+    loggerInfoStub.resetHistory();
+    bankCrawlerStub.screenshot.resetHistory();
+    bankCrawlerStub.login.resetHistory();
+    bankCrawlerStub.quit.resetHistory();
+    bankCrawlerStub.getAccountReader.resetHistory();
   });
 
   after(() => {
@@ -75,6 +86,8 @@ describe('bankAccountProcessor', () => {
     reconcileStub.restore();
     startOfMonthStub.restore();
     publishToSnsStub.restore();
+    loggerErrorStub.restore();
+    loggerInfoStub.restore();
   });
 
   describe('processUser', () => {
@@ -133,6 +146,21 @@ describe('bankAccountProcessor', () => {
         expect(getBankTransactionsStub.called).to.equal(true);
         expect(updateTransactionsStub.called).to.equal(false);
         expect(publishToSnsStub.called).to.equal(false);
+      });
+    });
+
+    describe('when the accountReader throws an error', () => {
+      it('should take a screenshot and log an error', async () => {
+        const accountReadErr = new Error('there was an error reading the account');
+        getTransactionsStub.throws(accountReadErr);
+
+        await bankAccountProcessor.processBankAccount(username, bankId, account, bankCrawlerStub, publisherConfig);
+
+        expect(getBankTransactionsStub.called).to.equal(false);
+        expect(updateTransactionsStub.called).to.equal(false);
+        expect(publishToSnsStub.called).to.equal(false);
+        expect(bankCrawlerStub.screenshot.called).to.equal(true);
+        expect(loggerErrorStub.getCall(0).args).to.eql(['An error occurred while processing.', accountReadErr]);
       });
     });
   });

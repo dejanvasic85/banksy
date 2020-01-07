@@ -47,7 +47,7 @@ export const processBankAccount = async (
     }
   } catch (err) {
     await bankCrawler.screenshot();
-    logger.error('An error occurred while processing. ', err);
+    logger.error('An error occurred while processing.', err);
   }
 };
 
