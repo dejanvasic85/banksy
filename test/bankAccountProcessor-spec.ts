@@ -173,35 +173,45 @@ describe('bankAccountProcessor', () => {
             description: 'kfc',
           },
         ];
+        const cachedTransactions = [
+          {
+            amount: 1,
+            date: 'today',
+            description: 'mcdonalds',
+          },
+        ];
 
         getBankTransactionsStub.resolves(newTransactions);
-
         getTransactionsStub.resolves({
           _id: 'cached-key',
-          transactions: [
-            {
-              amount: 1,
-              date: 'today',
-              description: 'mcdonalds',
-            },
-          ],
+          transactions: cachedTransactions,
         });
-
         reconcileStub.returns(newTransactions);
+        startOfMonthStub.returns('today');
 
         await bankAccountProcessor.processBankAccount(username, bankId, account, bankCrawlerStub, publisherConfig);
 
         expect(updateTransactionsStub.called).to.equal(true);
         expect(publishStub.called).to.equal(true);
-        expect(publishStub.getCall(0).args).to.eql([publisherConfig, {
-          accountName: 'bankAccount',
-          bankId: 'bank321',
-          username: 'user123',
-          transactions: [{
-            amount: 2,
-            date: 'yesterday',
-            description: 'kfc'
-          }]
+        expect(publishStub.getCall(0).args).to.eql([
+          publisherConfig,
+          {
+            accountName: 'bankAccount',
+            bankId: 'bank321',
+            username: 'user123',
+            transactions: [
+              {
+                amount: 2,
+                date: 'yesterday',
+                description: 'kfc',
+              },
+            ],
+          },
+        ]);
+        expect(reconcileStub.getCall(0).args).to.eql([{
+          cachedTransactions,
+          bankTransactions: newTransactions,
+          startOfMonth: 'today'
         }]);
       });
     });
