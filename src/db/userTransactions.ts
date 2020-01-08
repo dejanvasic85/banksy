@@ -1,4 +1,6 @@
-import { Schema, model } from 'mongoose';
+import { Schema } from 'mongoose';
+import { UserTransactionsModel } from '../types';
+import { connect } from './connect';
 
 const userTransactionSchema = new Schema({
   _id: String,
@@ -11,6 +13,7 @@ const userTransactionSchema = new Schema({
   ],
 });
 
-const UserTransactions = model('UserTransactions', userTransactionSchema);
-
-export { UserTransactions };
+export const createUserTransactions = async () => {
+  const conn = await connect();
+  return conn.model<UserTransactionsModel>('UserTransactions', userTransactionSchema);
+};

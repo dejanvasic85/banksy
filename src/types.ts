@@ -1,3 +1,16 @@
+import * as mongoose from 'mongoose';
+
+export interface UserTransactionsModel extends mongoose.Document {
+  _id: string;
+  transactions: [
+    {
+      amount: number;
+      date: string;
+      description: string;
+    },
+  ];
+}
+
 export interface Config {
   awsAccessKey: string;
   awsAccessSecret: string;
