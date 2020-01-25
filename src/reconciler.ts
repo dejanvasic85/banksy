@@ -43,6 +43,7 @@ export const reconcile = ({
   }
 
   return bankTransactions
+    .filter(({ amount }) => amount && amount > 0)
     .filter(({ date }) => moment(date).isSameOrAfter(startOfMonth))
     .filter(bt => !cachedTransactions.some(tt => areEqual(tt, bt)));
 };
