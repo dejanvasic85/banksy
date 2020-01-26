@@ -11,7 +11,6 @@ const start = async () => {
 
     const result = await connect();
 
-    logger.info(result);
     for (const username of config.users) {
       const userSecret = await getSecret(username);
       if (userSecret) {

@@ -38,11 +38,6 @@ describe('reconcile', () => {
       ],
       bankTransactions: [
         {
-          amount: null,
-          description: 'Bunnings Warehouse',
-          date: '2020-01-07T00:00:00+11:00',
-        },
-        {
           amount: 300, // different amount
           description: 'mcdonalds',
           date: '2019-12-28T00:00:00+11:00',
