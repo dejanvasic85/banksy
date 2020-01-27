@@ -11,7 +11,7 @@ CLI application capable of pulling (mostly web scraping) bank transactions from 
 
 In the architecture diagram below this application is on the left hand side purely responsible for fetching and publishing new bank transactions.
 
-![Architecture Diagram](https://drive.google.com/file/d/1orR5fQEn99HU-6cKs8hh9JQznay0Qzy_/view?usp=sharing)
+![Architecture Diagram](https://drive.google.com/uc?id=1orR5fQEn99HU-6cKs8hh9JQznay0Qzy_)
 
 ## Running the CLI
 
