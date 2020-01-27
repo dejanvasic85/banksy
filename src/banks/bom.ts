@@ -79,18 +79,33 @@ const getTransactions = async (
 ): Promise<BankTransaction[]> => {
   const headingRows = await driver.findElements(By.css(headingSelector));
   if (headingRows.length === 0) {
-    logger.warn(`Heading rows cannot be found for selector ${headingSelector}`);
+    logger.warn(`bom: Heading rows cannot be found for selector ${headingSelector}`);
     return [];
   }
 
   const indexes = await getColumnIndexesFromHeadingRow(headingRows[0]);
   if (indexes === null) {
-    logger.warn(`Unable to get the column indexes for selector ${rowSelector}`);
+    logger.info(`bom: Unable to get the column indexes for selector ${rowSelector}`);
     return [];
   }
 
   const { dateIndex, debitIndex, creditIndex, descriptionIndex } = indexes;
   const rows = await driver.findElements(By.css(rowSelector));
+
+  if (!rows || rows.length === 0) {
+    return [];
+  }
+
+  const firstItemText = await rows[0].getText();
+  if (
+    firstItemText
+      .trim()
+      .toLowerCase()
+      .indexOf('no transactions found') > -1
+  ) {
+    logger.info(`bom: No transactions found`);
+    return [];
+  }
 
   const txns = await Promise.all(
     rows.map(async (r: WebElement) => {
@@ -148,7 +163,6 @@ export const bomCrawler = async (credentials: string): Promise<BankAccountCrawle
     },
     getAccountReader: async (account: BankAccount): Promise<BankAccountReader> => {
       await driver.findElement(By.css(`a[href="viewAccountPortfolio.html"]`)).click();
-      logger.info(`Clicking on account [${account.accountName}]`);
       await driver.findElement(By.css(`[data-acctalias="${account.accountName}"] > h2 > a`)).click();
       return bomAccountReader(driver, account);
     },
