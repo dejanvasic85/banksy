@@ -160,7 +160,7 @@ describe('bankAccountProcessor', () => {
         expect(updateTransactionsStub.called).to.equal(false);
         expect(publishStub.called).to.equal(false);
         expect(bankCrawlerStub.screenshot.called).to.equal(true);
-        expect(loggerErrorStub.getCall(0).args).to.eql(['An error occurred while processing.', accountReadErr]);
+        expect(loggerErrorStub.getCall(0).args).to.eql(['bankAccountProcessor: An error occurred while processing.', accountReadErr]);
       });
     });
 

@@ -8,7 +8,7 @@ const client = new SecretsManager({
 });
 
 export const getSecret = async (secretName: string): Promise<string> => {
-  logger.info(`Fetching secret [${secretName}] please wait...`);
+  logger.info(`secretFetcher: [${secretName}] please wait...`);
 
   if (config.useLocalSecrets) {
     const fileName = `secret-${secretName}.json`;
@@ -20,7 +20,7 @@ export const getSecret = async (secretName: string): Promise<string> => {
     const data = await client.getSecretValue({ SecretId: secretName }).promise();
     return data.SecretString;
   } catch (err) {
-    logger.error(`Failed fetching secret.`, err);
+    logger.error(`secretFetcher: Failed fetching secret.`, err);
     return null;
   }
 };

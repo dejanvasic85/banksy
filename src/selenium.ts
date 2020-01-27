@@ -15,7 +15,7 @@ export const createDriver = async (): Promise<WebDriver> => {
   const chromeOptions = new chrome.Options().windowSize(screen);
 
   if (config.headlessBrowser) {
-    logger.info('Using headless browser.');
+    logger.info('selenium: Using headless browser.');
     chromeOptions.headless();
   }
 

@@ -41,7 +41,6 @@ export const westpacCredentialReader = (key: string): WestpacCredentials => {
 export const westpacAccountReader = (driver: WebDriver, account: BankAccount): BankAccountReader => {
   return {
     getBankTransactions: async (): Promise<BankTransaction[]> => {
-      logger.info('Getting transactions...');
       const txns: BankTransaction[] = [];
       const rowElements = await driver.wait(until.elementsLocated(By.css('tbody > tr')));
 
@@ -52,7 +51,7 @@ export const westpacAccountReader = (driver: WebDriver, account: BankAccount): B
         const parsedDate = parseDate(dateText);
 
         if (!parsedDate.isValid()) {
-          logger.warn(`Unable to parse date for transaction. Text: ${dateText}`);
+          logger.warn(`westpac: Unable to parse date for transaction. Text: ${dateText}`);
           continue;
         }
 

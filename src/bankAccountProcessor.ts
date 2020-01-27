@@ -47,7 +47,7 @@ export const processBankAccount = async (
     }
   } catch (err) {
     await bankCrawler.screenshot();
-    logger.error('An error occurred while processing.', err);
+    logger.error('bankAccountProcessor: An error occurred while processing.', err);
   }
 };
 
@@ -65,14 +65,14 @@ export const processUser = async (username: string, { banks, publisherConfig }: 
       continue;
     }
 
-    logger.info(`bankAccountProcessor: Logging in to ${bankConfig.bankId}. Please wait...`);
+    logger.info(`bankAccountProcessor: Processing bank ${bankConfig.bankId}. Please wait...`);
     await bankCrawler.login();
 
     for (const account of accounts) {
       await processBankAccount(username, bankConfig.bankId, account, bankCrawler, publisherConfig);
     }
 
-    logger.info(`Done. Closing bank ${bankConfig.bankId}`);
+    logger.info(`bankAccountProcessor: Done. Closing bank ${bankConfig.bankId}`);
     await bankCrawler.quit();
   }
 };
