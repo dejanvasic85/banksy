@@ -11,7 +11,7 @@ CLI application capable of pulling (mostly web scraping) bank transactions from 
 
 In the architecture diagram below this application is on the left hand side purely responsible for fetching and publishing new bank transactions.
 
-![](https://drive.google.com/open?id=1orR5fQEn99HU-6cKs8hh9JQznay0Qzy_)
+![Architecture Diagram](https://drive.google.com/file/d/1orR5fQEn99HU-6cKs8hh9JQznay0Qzy_/view?usp=sharing)
 
 ## Running the CLI
 
@@ -26,4 +26,6 @@ In order to ensure the transactions are unique, a mongo database is used to stor
 
 ## Subscribing to Transactions
 
-Each user configuration should have a publisher associated with a type and address. At the moment Amazon SNS is only supported but can easily be extended.
+Each user configuration should have a publisher associated with a type and address. At the moment Amazon SNS is only supported but can easily be extended. The benefit of sending it to a service like SNS is that it allows multiple subscribers to receive the message. 
+
+This is also a nice separation of concerns because the other side listening to transactions becomes a push mechanism. So my other repository for processing the messages can be found [here](https://github.com/dejanvasic85/banksy-ynab).
