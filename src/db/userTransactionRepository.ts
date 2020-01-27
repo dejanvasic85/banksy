@@ -18,7 +18,7 @@ export const createKey = (date: Date, bankId: string, accountName: string, usern
 export const getTransactions = async ({ date, bankId, accountName, username }): Promise<UserTransactionsModel> => {
   const key = createKey(date, bankId, accountName, username);
 
-  logger.info(`userTransactionRepository. Fetching transactions for ${key}`);
+  logger.info(`userTransactionRepository: Fetching transactions for ${key}`);
   const UserTransactions = await createUserTransactions();
   const todaysTransactions = await UserTransactions.findById(key);
 
