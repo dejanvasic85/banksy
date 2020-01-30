@@ -28,7 +28,7 @@
   "devDependencies": {
     "@types/chai": "4.2.7",
     "@types/mocha": "7.0.1",
-    "@types/mongoose": "5.5.43",
+    "@types/mongoose": "5.7.0",
     "@types/selenium-webdriver": "4.0.6",
     "@types/sinon": "7.5.1",
     "chai": "4.2.0",
