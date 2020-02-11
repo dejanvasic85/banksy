@@ -50,13 +50,27 @@ export const maxxiaCrawler = async (credentials: string): Promise<BankAccountCra
         .click();
     },
     getAccountReader: async (account: BankAccount): Promise<BankAccountReader> => {
-      await driver
-        .findElement(
-          By.id(
-            'Digital_BaseTheme_wt74_block_wtMainContent_Digital_Patterns_wt246_block_wtDashboardCards_Digital_Patterns_wt345_block_wtIcon',
-          ),
-        )
-        .click();
+      const walletIcon = await driver.findElement(
+        By.id(
+          'Digital_BaseTheme_wt74_block_wtMainContent_Digital_Patterns_wt246_block_wtDashboardCards_Digital_Patterns_wt345_block_wtIcon',
+        ),
+      );
+
+      await walletIcon.click();
+
+      const select = await driver.findElement(
+        By.id('Digital_BaseTheme_wt62_block_wtTopBarContent_WebPatterns_wt67_block_wtColumn2'),
+      );
+
+      await driver.wait(until.elementIsVisible(select));
+      await select.click();
+
+      // const select = await driver.wait(
+      //   until.elementIsVisible(By.id('Digital_BaseTheme_wt62_block_wtTopBarContent_WebPatterns_wt67_block_wtColumn2')),
+      // );
+
+      // await select.click();
+
       return maxxiaAccountReader(driver, account);
     },
     quit: async () => {
