@@ -73,16 +73,9 @@ export const maxxiaCrawler = async (credentials: string): Promise<BankAccountCra
         .click();
     },
     getAccountReader: async (account: BankAccount): Promise<BankAccountReader> => {
-      await pause(5000);
-      const walletIcon = await driver.findElement(
-        By.id(
-          'Digital_BaseTheme_wt74_block_wtMainContent_Digital_Patterns_wt246_block_wtDashboardCards_Digital_Patterns_wt345_block_wtIcon',
-        ),
+      await driver.get(
+        'https://securemaxxia.com.au/SecureMaxxia/Transactions.aspx?SelectedBenefitId=1652966&IsSourceDashboard=True',
       );
-
-      await walletIcon.click();
-      // todo - figure out how to wait using selenium here...
-      await pause(5000);
       return maxxiaAccountReader(driver, account);
     },
     quit: async () => {
