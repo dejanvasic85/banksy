@@ -8,18 +8,20 @@ const {
   AWS_ACCESS_KEY_ID,
   AWS_SECRET_ACCESS_KEY,
   AWS_REGION,
+  LOG_GROUP_NAME,
   LOG_GROUP_STREAM_NAME,
   HEADLESS_BROWSER,
   ENCRYPTION_KEY,
   MONGO_CONNECTION,
   USE_LOCAL_SECRETS,
-  USERS
+  USERS,
 } = process.env;
 
 export const config: Config = {
   awsAccessKey: AWS_ACCESS_KEY_ID,
   awsAccessSecret: AWS_SECRET_ACCESS_KEY,
   awsAccessRegion: AWS_REGION,
+  logGroupName: LOG_GROUP_NAME,
   logGroupStreamName: LOG_GROUP_STREAM_NAME,
   headlessBrowser: HEADLESS_BROWSER === 'true',
   encryptionKey: ENCRYPTION_KEY,

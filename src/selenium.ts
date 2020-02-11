@@ -35,3 +35,7 @@ export const textContains = (text: string, textToCompare: string): boolean => {
       .indexOf(textToCompare.trim().toLowerCase()) >= 0
   );
 };
+
+export const pause = (ms: number): Promise<void> => {
+  return new Promise(res => setTimeout(res, ms));
+};

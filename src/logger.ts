@@ -26,7 +26,7 @@ const logger = createLogger({
     new transports.Console({ format: format.combine(format.colorize(), format.simple()) }),
 
     new CloudWatchTransport({
-      logGroupName: 'banksy',
+      logGroupName: config.logGroupName,
       logStreamName: config.logGroupStreamName,
       createLogGroup: true,
       createLogStream: true,

@@ -15,6 +15,7 @@ export interface Config {
   awsAccessKey: string;
   awsAccessSecret: string;
   awsAccessRegion: string;
+  logGroupName: string;
   logGroupStreamName: string;
   headlessBrowser: boolean;
   encryptionKey: string;
