@@ -1,8 +1,11 @@
 require('chromedriver');
-import { By, WebDriver, until } from 'selenium-webdriver';
+import { By, WebDriver, WebElement } from 'selenium-webdriver';
 import { BankAccountCrawler, BankAccount, BankAccountReader } from '../types';
-import { createDriver, screenshotToDisk } from '../selenium';
+import { createDriver, screenshotToDisk, pause } from '../selenium';
 import { decrypt } from '../encrypt';
+import { parseDate, parseTextToAmount } from '../utils';
+
+const DATE_FORMAT = 'DD MMM YYYY';
 
 interface MaxxiaCredentials {
   username: string;
@@ -17,11 +20,31 @@ export const maxxiaCredentialReader = (credentials: string): MaxxiaCredentials =
   };
 };
 
-export const maxxiaAccountReader = (driver: WebDriver, _account: BankAccount): BankAccountReader => {
+export const maxxiaAccountReader = (driver: WebDriver, account: BankAccount): BankAccountReader => {
   return {
     getBankTransactions: async () => {
       const rows = await driver.findElements(By.css('table > tbody > tr'));
-      return [];
+      const txns = await Promise.all(
+        rows.map(async (row: WebElement) => {
+          const text = await row.getText();
+          const [dateText, description, accountName, amountText] = text.split('\n');
+
+          if (accountName.trim() !== account.accountName) {
+            return null;
+          }
+
+          const parsedDate = parseDate(dateText, DATE_FORMAT);
+          const amount = parseTextToAmount(amountText);
+
+          return {
+            amount,
+            description,
+            date: parsedDate.format(),
+          };
+        }),
+      );
+
+      return txns.filter(Boolean);
     },
   };
 };
@@ -57,20 +80,8 @@ export const maxxiaCrawler = async (credentials: string): Promise<BankAccountCra
       );
 
       await walletIcon.click();
-
-      const select = await driver.findElement(
-        By.id('Digital_BaseTheme_wt62_block_wtTopBarContent_WebPatterns_wt67_block_wtColumn2'),
-      );
-
-      await driver.wait(until.elementIsVisible(select));
-      await select.click();
-
-      // const select = await driver.wait(
-      //   until.elementIsVisible(By.id('Digital_BaseTheme_wt62_block_wtTopBarContent_WebPatterns_wt67_block_wtColumn2')),
-      // );
-
-      // await select.click();
-
+      // todo - figure out how to wait using selenium here...
+      await pause(5000);
       return maxxiaAccountReader(driver, account);
     },
     quit: async () => {

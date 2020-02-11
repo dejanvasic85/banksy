@@ -22,9 +22,6 @@ const parseTextToAmount = (text: string): number => {
   return parseFloat(cleaned);
 };
 
-const pause = (ms: number): Promise<void> => {
-  return new Promise(res => setTimeout(res, ms));
-};
 
 export const parseDate = (date: string): moment.Moment => {
   return moment(date, DATE_FORMAT);
