@@ -24,6 +24,12 @@ Ideally, this will be moved to be a serverless application that can be just depl
 
 In order to ensure the transactions are unique, a mongo database is used to store the previous transactions to compare against. 
 
+To create a local version of a mongo database the best option is docker. Run the following command:
+
+```
+docker run --name local-mongo -d -p 27017:27017 mongo:4.2
+```
+
 ## Subscribing to Transactions
 
 Each user configuration should have a publisher associated with a type and address. At the moment Amazon SNS is only supported but can easily be extended. The benefit of sending it to a service like SNS is that it allows multiple subscribers to receive the message. 
