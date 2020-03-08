@@ -14,7 +14,7 @@ const clean = (str: string): string => {
     .replace('pending', '')
     .replace('-', '')
     .trim();
-};
+}; 
 
 const areEqual = (existingTxn: BankTransaction, accountTxn: BankTransaction) => {
   if (!existingTxn || !accountTxn) {
