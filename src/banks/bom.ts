@@ -1,4 +1,4 @@
-import { By, WebElement, WebDriver } from 'selenium-webdriver';
+import { By, WebElement, WebDriver, until } from 'selenium-webdriver';
 import { decrypt } from '../encrypt';
 import { BankAccountReader, BankAccountCrawler, BankTransaction, BankAccount, ColumnIndexes } from '../types';
 import { createDriver, screenshotToDisk, textContains } from '../selenium';
@@ -162,8 +162,12 @@ export const bomCrawler = async (credentials: string): Promise<BankAccountCrawle
       await driver.findElement(By.id('logonButton')).click();
     },
     getAccountReader: async (account: BankAccount): Promise<BankAccountReader> => {
-      await driver.findElement(By.css(`a[href="viewAccountPortfolio.html"]`)).click();
-      await driver.findElement(By.css(`[data-acctalias="${account.accountName}"] > h2 > a`)).click();
+      const viewAccountElement = await driver.wait(until.elementLocated(By.css('a[href="viewAccountPortfolio.html')));
+      await viewAccountElement.click();
+
+      const accountNameLink = await driver.wait(until.elementLocated(By.css(`[data-acctalias="${account.accountName}"] > h2 > a`)));;
+      await accountNameLink.click();
+
       return bomAccountReader(driver, account);
     },
     quit: async () => {
