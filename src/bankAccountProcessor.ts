@@ -1,5 +1,5 @@
 import { bankAccountFactory } from './bankAccountFactory';
-import { getTransactions, updateTransactions } from './db/userTransactionRepository';
+import { getTransactions, createTransactions } from './db';
 import { reconcile } from './reconciler';
 import logger from './logger';
 import { UserConfig, TransactionsMessage, BankAccount, BankAccountCrawler, PublisherConfig } from './types';
@@ -17,11 +17,10 @@ export const processBankAccount = async (
     logger.info(`bankAccountProcessor: Processing account ${account.accountName}`);
     const { accountName } = account;
     const accountReader = await bankCrawler.getAccountReader(account);
-    
+
     const now = new Date();
 
     const cached = await getTransactions({
-      date: now,
       bankId,
       accountName,
       username,
@@ -36,7 +35,7 @@ export const processBankAccount = async (
 
     if (newTransactions.length > 0) {
       logger.info(`bankAccountProcessor: New Transactions. Found total of ${newTransactions.length}`);
-      await updateTransactions(cached._id, newTransactions);
+      await createTransactions(newTransactions);
       const message: TransactionsMessage = {
         username,
         bankId,
