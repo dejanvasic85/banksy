@@ -17,25 +17,18 @@ export const processBankAccount = async (
     logger.info(`bankAccountProcessor: Processing account ${account.accountName}`);
     const { accountName } = account;
     const accountReader = await bankCrawler.getAccountReader(account);
-
-    const now = new Date();
-
-    const cached = await getTransactions({
-      bankId,
-      accountName,
-      username,
-    });
+    const cached = await getTransactions(bankId, accountName, username);
 
     const bankTransactions = await accountReader.getBankTransactions();
     const newTransactions = reconcile({
-      cachedTransactions: cached.transactions,
+      cachedTransactions: cached,
       bankTransactions,
       startOfMonth: getStartOfMonth(),
     });
 
     if (newTransactions.length > 0) {
       logger.info(`bankAccountProcessor: New Transactions. Found total of ${newTransactions.length}`);
-      await createTransactions(newTransactions);
+      await createTransactions(bankId, accountName, username, newTransactions);
       const message: TransactionsMessage = {
         username,
         bankId,
