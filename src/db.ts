@@ -1,6 +1,7 @@
 import { Pool } from 'pg';
 import { BankTransaction } from './types';
 import { config } from './config';
+import logger from './logger';
 
 // This will automatically use environment variables
 const pgClient = new Pool({
@@ -43,9 +44,11 @@ export const getTransactions = async (
     await pgClient.query(userBankInsert(bankId, accountName, username));
     return [];
   }
-
+  
   const [{ id }] = userBanksResult.rows;
   const { rows } = await pgClient.query(userBankTransactionsQuery(id));
+  
+  logger.info(`Found ${rows.length} number of transactions in cache`);
 
   return rows as BankTransaction[];
 };
