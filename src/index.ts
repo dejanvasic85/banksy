@@ -2,14 +2,11 @@ import { config } from './config';
 import { getSecret } from './secretFetcher';
 import { processUser } from './bankAccountProcessor';
 import logger from './logger';
-import { connect } from './db/connect';
 import { UserConfig } from './types';
 
 const start = async () => {
   try {
     logger.info('Service launching. Connecting to mongo');
-
-    const result = await connect();
 
     for (const username of config.users) {
       const userSecret = await getSecret(username);

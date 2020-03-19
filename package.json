@@ -5,7 +5,7 @@
   "main": "handler.js",
   "scripts": {
     "test": "mocha -r ts-node/register ./test/*-spec.ts",
-    "test:integration": "mocha -r ts-node/register ./integration-tests/*.ts --timeout 60000",
+    "test:integration": "mocha -r ts-node/register ./integration-tests/db-pg.ts --timeout 60000",
     "test:single": "mocha -r ts-node/register ./test/$test*-spec.ts --watch-extensions ts --w",
     "start": "ts-node ./src/index.ts",
     "build": "tsc",
@@ -20,7 +20,7 @@
     "cryptr": "^6.0.1",
     "dotenv": "^8.2.0",
     "moment": "^2.24.0",
-    "mongoose": "^5.7.12",
+    "pg": "^7.18.2",
     "selenium-webdriver": "^4.0.0-alpha.5",
     "winston": "^3.2.1",
     "winston-aws-cloudwatch": "^3.0.0"
@@ -28,7 +28,7 @@
   "devDependencies": {
     "@types/chai": "4.2.11",
     "@types/mocha": "7.0.2",
-    "@types/mongoose": "5.7.6",
+    "@types/pg": "^7.14.2",
     "@types/selenium-webdriver": "4.0.9",
     "@types/sinon": "7.5.2",
     "chai": "4.2.0",

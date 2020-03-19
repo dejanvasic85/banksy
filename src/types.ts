@@ -22,6 +22,14 @@ export interface Config {
   mongoConnection: string;
   useLocalSecrets: boolean;
   users: string[];
+
+  pg: {
+    user: string;
+    password: string;
+    host: string;
+    database: string;
+    port: number;
+  };
 }
 
 export interface BankAccount {

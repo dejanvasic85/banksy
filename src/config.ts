@@ -15,6 +15,12 @@ const {
   MONGO_CONNECTION,
   USE_LOCAL_SECRETS,
   USERS,
+
+  PGUSER,
+  PGHOST,
+  PGPASSWORD,
+  PGDATABASE,
+  PGPORT,
 } = process.env;
 
 export const config: Config = {
@@ -28,4 +34,12 @@ export const config: Config = {
   mongoConnection: MONGO_CONNECTION,
   useLocalSecrets: USE_LOCAL_SECRETS === 'true',
   users: USERS?.split(','),
+
+  pg: {
+    user: PGUSER,
+    password: PGPASSWORD,
+    host: PGHOST,
+    database: PGDATABASE,
+    port: Number(PGPORT || 5432),
+  },
 };

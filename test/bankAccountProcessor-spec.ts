@@ -3,7 +3,7 @@ import { stub } from 'sinon';
 
 import * as bankAccountProcessor from '../src/bankAccountProcessor';
 import * as bankAccountFactory from '../src/bankAccountFactory';
-import * as userRepository from '../src/db/userTransactionRepository';
+import * as userRepository from '../src/db';
 import * as reconciler from '../src/reconciler';
 import * as startOfMonth from '../src/startOfMonth';
 import * as publisher from '../src/publisher';
@@ -28,7 +28,7 @@ describe('bankAccountProcessor', () => {
   let bankAccountFactoryStub: any;
   let bankCrawlerStub: any;
   let getTransactionsStub: any;
-  let updateTransactionsStub: any;
+  let createTransactionsStub: any;
   let reconcileStub: any;
   let startOfMonthStub: any;
   let getBankTransactionsStub: any;
@@ -54,7 +54,7 @@ describe('bankAccountProcessor', () => {
     bankAccountFactoryStub.resolves(bankCrawlerStub);
 
     getTransactionsStub = stub(userRepository, 'getTransactions');
-    updateTransactionsStub = stub(userRepository, 'updateTransactions');
+    createTransactionsStub = stub(userRepository, 'createTransactions');
     reconcileStub = stub(reconciler, 'reconcile');
     startOfMonthStub = stub(startOfMonth, 'getStartOfMonth');
     publishStub = stub(publisher, 'publish');
@@ -66,7 +66,7 @@ describe('bankAccountProcessor', () => {
     bankCrawlerStub.login.resetHistory();
     bankAccountFactoryStub.resetHistory();
     getTransactionsStub.resetHistory();
-    updateTransactionsStub.resetHistory();
+    createTransactionsStub.resetHistory();
     reconcileStub.resetHistory();
     startOfMonthStub.resetHistory();
     getBankTransactionsStub.resetHistory();
@@ -82,7 +82,7 @@ describe('bankAccountProcessor', () => {
   after(() => {
     bankAccountFactoryStub.restore();
     getTransactionsStub.restore();
-    updateTransactionsStub.restore();
+    createTransactionsStub.restore();
     reconcileStub.restore();
     startOfMonthStub.restore();
     publishStub.restore();
@@ -144,7 +144,7 @@ describe('bankAccountProcessor', () => {
 
         expect(getTransactionsStub.called).to.equal(true);
         expect(getBankTransactionsStub.called).to.equal(true);
-        expect(updateTransactionsStub.called).to.equal(false);
+        expect(createTransactionsStub.called).to.equal(false);
         expect(publishStub.called).to.equal(false);
       });
     });
@@ -157,7 +157,7 @@ describe('bankAccountProcessor', () => {
         await bankAccountProcessor.processBankAccount(username, bankId, account, bankCrawlerStub, publisherConfig);
 
         expect(getBankTransactionsStub.called).to.equal(false);
-        expect(updateTransactionsStub.called).to.equal(false);
+        expect(createTransactionsStub.called).to.equal(false);
         expect(publishStub.called).to.equal(false);
         expect(bankCrawlerStub.screenshot.called).to.equal(true);
         expect(loggerErrorStub.getCall(0).args).to.eql(['bankAccountProcessor: An error occurred while processing.', accountReadErr]);
@@ -191,7 +191,7 @@ describe('bankAccountProcessor', () => {
 
         await bankAccountProcessor.processBankAccount(username, bankId, account, bankCrawlerStub, publisherConfig);
 
-        expect(updateTransactionsStub.called).to.equal(true);
+        expect(createTransactionsStub.called).to.equal(true);
         expect(publishStub.called).to.equal(true);
         expect(publishStub.getCall(0).args).to.eql([
           publisherConfig,
