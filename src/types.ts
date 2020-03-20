@@ -1,16 +1,3 @@
-import * as mongoose from 'mongoose';
-
-export interface UserTransactionsModel extends mongoose.Document {
-  _id: string;
-  transactions: [
-    {
-      amount: number;
-      date: string;
-      description: string;
-    },
-  ];
-}
-
 export interface Config {
   awsAccessKey: string;
   awsAccessSecret: string;
@@ -62,10 +49,10 @@ export interface BankAccountReader {
 }
 
 export interface BankAccountCrawler {
-  screenshot();
-  login(): Promise<void>;
-  getAccountReader(account: BankAccount): Promise<BankAccountReader>;
-  quit(): Promise<void>;
+  screenshot: () => void;
+  login: () => Promise<void>;
+  getAccountReader: (account: BankAccount) => Promise<BankAccountReader>;
+  quit: () => Promise<void>;
 }
 
 export interface BankTransaction {
@@ -79,6 +66,7 @@ export interface TransactionsMessage {
   bankId: string;
   accountName: string;
   transactions: BankTransaction[];
+  duplicates: BankTransaction[];
 }
 
 export interface ColumnIndexes {
@@ -86,4 +74,14 @@ export interface ColumnIndexes {
   descriptionIndex: number;
   debitIndex: number;
   creditIndex: number;
+}
+
+export interface ReconcileParams {
+  cachedTransactions: BankTransaction[];
+  bankTransactions: BankTransaction[];
+}
+
+export interface ReconcileResult {
+  newTransactions: BankTransaction[];
+  duplicates: BankTransaction[];
 }

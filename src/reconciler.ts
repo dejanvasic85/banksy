@@ -1,48 +1,61 @@
-import { BankTransaction } from './types';
-import * as moment from 'moment';
+import { BankTransaction, ReconcileResult, ReconcileParams } from './types';
 
-export interface ReconcileParams {
-  startOfMonth: moment.Moment;
-  cachedTransactions: BankTransaction[];
-  bankTransactions: BankTransaction[];
-}
+const cleanForStorage = (str: string): string => {
+  return str
+    .replace(/pending/gi, '')
+    .replace(/-/g, '')
+    .trim();
+};
 
-const clean = (str: string): string => {
+const cleanForCompare = (str: string): string => {
   if (!str) return '';
   return str
     .toLowerCase()
-    .replace('pending', '')
-    .replace('-', '')
     .trim();
-}; 
+};
 
-const areEqual = (existingTxn: BankTransaction, accountTxn: BankTransaction) => {
-  if (!existingTxn || !accountTxn) {
+const areEqual = (cachedTxn: BankTransaction, bankTxn: BankTransaction) => {
+  if (!cachedTxn || !bankTxn) {
     return false;
   }
 
   return (
-    existingTxn.amount === accountTxn.amount &&
-    clean(existingTxn.description) === clean(accountTxn.description) &&
-    existingTxn.date === accountTxn.date
+    cachedTxn.amount === bankTxn.amount &&
+    cleanForCompare(cachedTxn.description) === cleanForCompare(bankTxn.description)
   );
 };
 
-export const reconcile = ({
-  startOfMonth,
-  cachedTransactions,
-  bankTransactions,
-}: ReconcileParams): BankTransaction[] => {
-  if (bankTransactions.length === 0) {
-    return [];
+export const reconcile = ({ cachedTransactions, bankTransactions }: ReconcileParams): ReconcileResult => {
+  const result = {
+    newTransactions: [],
+    duplicates: [],
+  };
+
+  if (!bankTransactions || bankTransactions.length === 0) {
+    return result;
   }
 
   if (!cachedTransactions) {
-    // return all
-    return bankTransactions;
+    result.newTransactions = bankTransactions;
+    return result;
   }
 
-  return bankTransactions
-    .filter(({ date }) => moment(date).isSameOrAfter(startOfMonth))
-    .filter(bt => !cachedTransactions.some(tt => areEqual(tt, bt)));
+  const cleanedBankTransactions = bankTransactions.map(bt => {
+    return {
+      ...bt,
+      description: cleanForStorage(bt.description),
+    };
+  });
+
+  cleanedBankTransactions.forEach(bt => {
+    const matchingCachedTransactions = cachedTransactions.filter(ct => areEqual(ct, bt));
+
+    if (matchingCachedTransactions.length > 0) {
+      result.duplicates.push(bt);
+    } else {
+      result.newTransactions.push(bt);
+    }
+  });
+
+  return result;
 };

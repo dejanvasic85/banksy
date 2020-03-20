@@ -4,7 +4,6 @@ import { reconcile } from './reconciler';
 import logger from './logger';
 import { UserConfig, TransactionsMessage, BankAccount, BankAccountCrawler, PublisherConfig } from './types';
 import { publish } from './publisher';
-import { getStartOfMonth } from './startOfMonth';
 
 export const processBankAccount = async (
   username: string,
@@ -17,13 +16,13 @@ export const processBankAccount = async (
     logger.info(`bankAccountProcessor: Processing account ${account.accountName}`);
     const { accountName } = account;
     const accountReader = await bankCrawler.getAccountReader(account);
-    const cached = await getTransactions(bankId, accountName, username);
+    const cachedTransactions = await getTransactions(bankId, accountName, username);
 
     const bankTransactions = await accountReader.getBankTransactions();
-    const newTransactions = reconcile({
-      cachedTransactions: cached,
+
+    const { newTransactions, duplicates } = reconcile({
+      cachedTransactions,
       bankTransactions,
-      startOfMonth: getStartOfMonth(),
     });
 
     if (newTransactions.length > 0) {
@@ -34,6 +33,7 @@ export const processBankAccount = async (
         bankId,
         accountName,
         transactions: newTransactions,
+        duplicates,
       };
       await publish(publisherConfig, message);
     }

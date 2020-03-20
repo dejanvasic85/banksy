@@ -44,10 +44,10 @@ export const getTransactions = async (
     await pgClient.query(userBankInsert(bankId, accountName, username));
     return [];
   }
-  
+
   const [{ id }] = userBanksResult.rows;
   const { rows } = await pgClient.query(userBankTransactionsQuery(id));
-  
+
   logger.info(`Found ${rows.length} number of transactions in cache`);
 
   return rows as BankTransaction[];
@@ -68,6 +68,10 @@ export const createTransactions = async (
   const [{ id }] = userBanksResult.rows;
 
   for (const t of txns) {
+    logger.info('Creating transaction for userBankId', {
+      userBankId: id,
+      transaction: t,
+    });
     await pgClient.query(userBankTransactionInsert(id, t));
   }
 };
