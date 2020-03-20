@@ -49,7 +49,7 @@ export interface BankAccountReader {
 }
 
 export interface BankAccountCrawler {
-  screenshot: () => void;
+  screenshot: () => Promise<void>;
   login: () => Promise<void>;
   getAccountReader: (account: BankAccount) => Promise<BankAccountReader>;
   quit: () => Promise<void>;
