@@ -1,4 +1,6 @@
 import { Pool } from 'pg';
+import * as moment from 'moment';
+
 import { BankTransaction } from './types';
 import { config } from './config';
 import logger from './logger';
@@ -22,7 +24,7 @@ const userBankInsert = (bankId: string, accountName: string, username: string) =
 
 const userBankTransactionsQuery = (userBankId: number) => ({
   name: 'fetch-user-bank-transactions',
-  text: `SELECT * FROM "userBankTransactions" WHERE "userbankid" = $1 AND "date" > current_date - interval '6' day;`,
+  text: `SELECT * FROM "userBankTransactions" WHERE "userbankid" = $1 AND "date" > current_date - interval '${config.daysToFetchCachedTxns}' day;`,
   values: [userBankId],
 });
 
@@ -50,7 +52,14 @@ export const getTransactions = async (
 
   logger.info(`Found ${rows.length} number of transactions in cache`);
 
-  return rows as BankTransaction[];
+  return rows.map(({ amount, description, date }) => {
+    const t: BankTransaction = {
+      amount: Number(amount),
+      description: description,
+      date: moment(date).toISOString(),
+    };
+    return t;
+  });
 };
 
 export const createTransactions = async (

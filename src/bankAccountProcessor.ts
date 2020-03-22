@@ -20,20 +20,27 @@ export const processBankAccount = async (
 
     const bankTransactions = await accountReader.getBankTransactions();
 
-    const { newTransactions, duplicates } = reconcile({
+    const { newTxns, matchingTxns, duplicateTxns } = reconcile({
       cachedTransactions,
       bankTransactions,
     });
 
-    if (newTransactions.length > 0) {
-      logger.info(`bankAccountProcessor: New Transactions. Found total of ${newTransactions.length}`);
-      await createTransactions(bankId, accountName, username, newTransactions);
+    logger.info('bankAccountProcessor: Finished Reconciling', {
+      newTxnsCount: newTxns.length,
+      matchingTxnsCount: newTxns.length,
+      duplicateTxnsCount: duplicateTxns.length,
+    });
+
+    if (newTxns.length > 0) {
+      logger.info(`bankAccountProcessor: New Transactions. Found total of ${newTxns.length}`);
+      await createTransactions(bankId, accountName, username, newTxns);
       const message: TransactionsMessage = {
         username,
         bankId,
         accountName,
-        transactions: newTransactions,
-        duplicates,
+        newTxns,
+        duplicateTxns,
+        matchingTxns,
       };
       await publish(publisherConfig, message);
     }

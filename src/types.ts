@@ -17,6 +17,9 @@ export interface Config {
     database: string;
     port: number;
   };
+
+  daysToFetchCachedTxns: number;
+  daysToMatchDuplicateTxns: number;
 }
 
 export interface BankAccount {
@@ -65,8 +68,9 @@ export interface TransactionsMessage {
   username: string;
   bankId: string;
   accountName: string;
-  transactions: BankTransaction[];
-  duplicates: BankTransaction[];
+  newTxns: BankTransaction[];
+  matchingTxns: BankTransaction[];
+  duplicateTxns: BankTransaction[];
 }
 
 export interface ColumnIndexes {
@@ -82,6 +86,7 @@ export interface ReconcileParams {
 }
 
 export interface ReconcileResult {
-  newTransactions: BankTransaction[];
-  duplicates: BankTransaction[];
+  newTxns: BankTransaction[];
+  duplicateTxns: BankTransaction[];
+  matchingTxns: BankTransaction[];
 }
