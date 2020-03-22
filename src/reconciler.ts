@@ -54,12 +54,14 @@ export const reconcile = ({ cachedTransactions, bankTransactions }: ReconcilePar
   }
 
   // Fixes up the description for the incoming bank transactions (e.g. Pending... )
-  const cleanedBankTxns = bankTransactions.map(bt => {
-    return {
-      ...bt,
-      description: cleanForStorage(bt.description),
-    };
-  });
+  const cleanedBankTxns = bankTransactions
+    .filter(bt => bt.amount)
+    .map(bt => {
+      return {
+        ...bt,
+        description: cleanForStorage(bt.description),
+      };
+    });
 
   var value = cleanedBankTxns.reduce((prev: ReconcileResult, currentBankTxn: BankTransaction) => {
     const matching = cachedTransactions.find(cached => areEqual(cached, currentBankTxn));
