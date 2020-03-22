@@ -1,16 +1,3 @@
-import * as mongoose from 'mongoose';
-
-export interface UserTransactionsModel extends mongoose.Document {
-  _id: string;
-  transactions: [
-    {
-      amount: number;
-      date: string;
-      description: string;
-    },
-  ];
-}
-
 export interface Config {
   awsAccessKey: string;
   awsAccessSecret: string;
@@ -30,6 +17,9 @@ export interface Config {
     database: string;
     port: number;
   };
+
+  daysToFetchCachedTxns: number;
+  daysToMatchDuplicateTxns: number;
 }
 
 export interface BankAccount {
@@ -62,10 +52,10 @@ export interface BankAccountReader {
 }
 
 export interface BankAccountCrawler {
-  screenshot();
-  login(): Promise<void>;
-  getAccountReader(account: BankAccount): Promise<BankAccountReader>;
-  quit(): Promise<void>;
+  screenshot: () => Promise<void>;
+  login: () => Promise<void>;
+  getAccountReader: (account: BankAccount) => Promise<BankAccountReader>;
+  quit: () => Promise<void>;
 }
 
 export interface BankTransaction {
@@ -78,7 +68,9 @@ export interface TransactionsMessage {
   username: string;
   bankId: string;
   accountName: string;
-  transactions: BankTransaction[];
+  newTxns: BankTransaction[];
+  matchingTxns: BankTransaction[];
+  duplicateTxns: BankTransaction[];
 }
 
 export interface ColumnIndexes {
@@ -86,4 +78,15 @@ export interface ColumnIndexes {
   descriptionIndex: number;
   debitIndex: number;
   creditIndex: number;
+}
+
+export interface ReconcileParams {
+  cachedTransactions: BankTransaction[];
+  bankTransactions: BankTransaction[];
+}
+
+export interface ReconcileResult {
+  newTxns: BankTransaction[];
+  duplicateTxns: BankTransaction[];
+  matchingTxns: BankTransaction[];
 }

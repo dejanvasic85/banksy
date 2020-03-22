@@ -1,21 +1,20 @@
-import { reconcile } from '../src/reconciler';
 import { expect } from 'chai';
-import * as moment from 'moment';
+
+import { config } from '../src/config';
+
+import { reconcile } from '../src/reconciler';
 
 describe.only('reconcile', () => {
-  const txnDate = '2019-12-28T00:00:00+11:00';
-  const txnMomentDate = moment(txnDate);
-  const txnStartOfMonth = txnMomentDate.startOf('month');
-
   describe('when cache and new transactions are empty', () => {
     it('should return empty array', () => {
-      const result = reconcile({
-        startOfMonth: null,
+      const { newTxns, matchingTxns, duplicateTxns } = reconcile({
         cachedTransactions: [],
         bankTransactions: [],
       });
 
-      expect(result).to.have.lengthOf(0);
+      expect(newTxns).to.have.lengthOf(0);
+      expect(matchingTxns).to.have.lengthOf(0);
+      expect(duplicateTxns).to.have.lengthOf(0);
     });
   });
 
@@ -24,11 +23,10 @@ describe.only('reconcile', () => {
       const txn = {
         amount: 300,
         description: 'mcdonalds',
-        date: txnDate,
+        date: '2020-03-14T13:00:00.000Z',
       };
 
       const cachedTransactions = [txn];
-
       const bankTransactions = [
         {
           ...txn,
@@ -36,61 +34,94 @@ describe.only('reconcile', () => {
         },
       ];
 
-      const result = reconcile({ startOfMonth: txnStartOfMonth, cachedTransactions, bankTransactions });
+      const { newTxns, matchingTxns, duplicateTxns } = reconcile({ cachedTransactions, bankTransactions });
 
-      expect(result).to.eql([
+      expect(newTxns).to.eql([
         {
           amount: 350,
           description: 'mcdonalds',
-          date: txnDate,
+          date: '2020-03-14T13:00:00.000Z',
+        },
+      ]);
+      expect(matchingTxns).to.have.lengthOf(0);
+      expect(duplicateTxns).to.have.lengthOf(0);
+    });
+  });
+
+  describe('when the description is same but different casing', () => {
+    it('should return duplicate transaction', () => {
+      const txn = {
+        amount: 300,
+        description: 'mcdonalds',
+        date: '2020-03-14T13:00:00.000Z',
+      };
+
+      const cachedTransactions = [txn];
+      const bankTransactions = [
+        {
+          ...txn,
+          description: 'McDonalds',
+        },
+      ];
+
+      const { matchingTxns, newTxns, duplicateTxns } = reconcile({ cachedTransactions, bankTransactions });
+
+      expect(newTxns).to.have.lengthOf(0);
+      expect(duplicateTxns).to.have.lengthOf(0);
+      expect(matchingTxns).to.eql([
+        {
+          amount: 300,
+          description: 'McDonalds',
+          date: '2020-03-14T13:00:00.000Z',
         },
       ]);
     });
   });
 
-  describe('when the description is same but different casing', () => {
-    it('should return no new transactions', () => {
-      const txn = {
-        amount: 300,
-        description: 'mcdonalds',
-        date: txnDate,
-      };
-
-      const cachedTransactions = [txn];
-
-      const bankTransactions = [
+  describe('when the description contains pending', () => {
+    it('should return duplicate transaction', () => {
+      const cachedTransactions = [
         {
-          ...txn,
+          amount: 300,
           description: 'McDonalds',
+          date: '2020-03-14T13:00:00.000Z',
+        },
+        {
+          amount: 200,
+          description: 'Kfc',
+          date: '2020-03-14T13:00:00.000Z',
         },
       ];
 
-      const result = reconcile({ startOfMonth: txnStartOfMonth, cachedTransactions, bankTransactions });
-
-      expect(result).to.have.lengthOf(0);
-    });
-  });
-
-  describe('when the description contains pending and bank txn ', () => {
-    it('should return no new transactions', () => {
-      const txn = {
-        amount: 300,
-        description: 'mcdonalds',
-        date: txnDate,
-      };
-
-      const cachedTransactions = [txn];
-
       const bankTransactions = [
         {
-          ...txn,
-          description: 'McDonalds',
+          amount: 300,
+          description: 'pending - McDonalds',
+          date: '2020-03-14T13:00:00.000Z',
+        },
+        {
+          amount: 200,
+          description: 'PENDING  - KFC',
+          date: '2020-03-14T13:00:00.000Z',
         },
       ];
 
-      const result = reconcile({ startOfMonth: txnStartOfMonth, cachedTransactions, bankTransactions });
+      const { matchingTxns, newTxns, duplicateTxns } = reconcile({ cachedTransactions, bankTransactions });
 
-      expect(result).to.have.lengthOf(0);
+      expect(newTxns).to.have.lengthOf(0);
+      expect(duplicateTxns).to.have.lengthOf(0);
+      expect(matchingTxns).to.eql([
+        {
+          amount: 300,
+          description: 'McDonalds',
+          date: '2020-03-14T13:00:00.000Z',
+        },
+        {
+          amount: 200,
+          description: 'KFC',
+          date: '2020-03-14T13:00:00.000Z',
+        },
+      ]);
     });
   });
 
@@ -99,11 +130,10 @@ describe.only('reconcile', () => {
       const txn = {
         amount: 300,
         description: 'mcdonalds',
-        date: txnDate,
+        date: '2020-03-14T13:00:00.000Z',
       };
 
       const cachedTransactions = [txn];
-
       const bankTransactions = [
         {
           ...txn,
@@ -111,42 +141,119 @@ describe.only('reconcile', () => {
         },
       ];
 
-      const result = reconcile({ startOfMonth: txnStartOfMonth, cachedTransactions, bankTransactions });
+      const { newTxns, matchingTxns, duplicateTxns } = reconcile({ cachedTransactions, bankTransactions });
 
-      expect(result).to.eql([
+      expect(newTxns).to.eql([
         {
           amount: 300,
           description: 'target',
-          date: txnDate,
+          date: '2020-03-14T13:00:00.000Z',
         },
       ]);
+      expect(matchingTxns).to.have.lengthOf(0);
+      expect(duplicateTxns).to.have.lengthOf(0);
     });
   });
 
-  describe('when the date is different', () => {
-    it('should return the new transaction', () => {
-      const txn = {
+  describe('when duplicate txns are compared because of date range (config = 5)', () => {
+    // Usually cached date in the database has the pending transaction
+    // And the transaction found in the bank's page has different date (other details remain the same)
+
+    it('should have daysToMatchDuplicateTxns config set to 5 days', () => {
+      expect(config.daysToMatchDuplicateTxns).to.equal(5);
+    });
+
+    it('should return duplicate transactions when bank date is later and within range', () => {
+      const cachedDate = '2020-03-14T13:00:00.000Z';
+      const bankTxnDate = '2020-03-18T00:00:00+11:00';
+
+      const txn: any = {
         amount: 300,
         description: 'mcdonalds',
-        date: txnDate,
       };
 
-      const cachedTransactions = [txn];
+      const cachedTransactions = [{ ...txn, date: cachedDate }];
+      const bankTransactions = [{ ...txn, date: bankTxnDate }];
 
-      const bankTransactions = [
-        {
-          ...txn,
-          date: '2019-12-27T00:00:00+11:00',
-        },
-      ];
+      const { newTxns, matchingTxns, duplicateTxns } = reconcile({ cachedTransactions, bankTransactions });
 
-      const result = reconcile({ startOfMonth: txnStartOfMonth, cachedTransactions, bankTransactions });
-
-      expect(result).to.eql([
+      expect(newTxns).to.have.lengthOf(0);
+      expect(matchingTxns).to.have.lengthOf(0);
+      expect(duplicateTxns).to.eql([
         {
           amount: 300,
           description: 'mcdonalds',
-          date: '2019-12-27T00:00:00+11:00',
+          date: bankTxnDate,
+        },
+      ]);
+    });
+
+    it('should return duplicate transactions when bank date is later and within range and first 10 chars match', () => {
+      const cachedDate = '2020-03-14T13:00:00.000Z';
+      const bankTxnDate = '2020-03-18T00:00:00+11:00';
+
+      const cachedTransactions = [{ date: cachedDate, amount: 200, description: 'Dodo Power & Gas Melbourne AU' }];
+      const bankTransactions = [{ date: bankTxnDate, amount: 200, description: 'Dodo Power and Gas Melbourne Au' }];
+
+      const { newTxns, matchingTxns, duplicateTxns } = reconcile({ cachedTransactions, bankTransactions });
+
+      expect(newTxns).to.have.lengthOf(0);
+      expect(matchingTxns).to.have.lengthOf(0);
+      expect(duplicateTxns).to.eql([
+        {
+          amount: 200,
+          description: 'Dodo Power and Gas Melbourne Au',
+          date: bankTxnDate,
+        },
+      ]);
+    });
+
+    it('should return new transactions when bank date is older and within range', () => {
+      const cachedDate = '2020-03-14T13:00:00.000Z';
+      const bankTxnDate = '2020-03-13T00:00:00+11:00';
+
+      const txn: any = {
+        amount: 300,
+        description: 'mcdonalds',
+      };
+
+      const cachedTransactions = [{ ...txn, date: cachedDate }];
+      const bankTransactions = [{ ...txn, date: bankTxnDate }];
+
+      const { newTxns, matchingTxns, duplicateTxns } = reconcile({ cachedTransactions, bankTransactions });
+
+      expect(duplicateTxns).to.have.lengthOf(0);
+      expect(matchingTxns).to.have.lengthOf(0);
+      expect(newTxns).to.eql([
+        {
+          amount: 300,
+          description: 'mcdonalds',
+          date: bankTxnDate,
+        },
+      ]);
+    });
+
+    it('should return new transactions when bank date newer and just out of range', () => {
+      const cachedDate = '2020-03-14T13:00:00.000Z';
+      const bankTxnDate = '2020-03-21T00:00:00+11:00';
+
+      const txn: any = {
+        amount: 300,
+        description: 'mcdonalds',
+      };
+
+      const cachedTransactions = [{ ...txn, date: cachedDate }];
+      const bankTransactions = [{ ...txn, date: bankTxnDate }];
+
+      const { newTxns, matchingTxns, duplicateTxns } = reconcile({ cachedTransactions, bankTransactions });
+
+      expect(duplicateTxns).to.have.lengthOf(0);
+      expect(matchingTxns).to.have.lengthOf(0);
+      expect(newTxns).to.eql([
+        {
+          amount: 300,
+          description: 'mcdonalds',
+          date: bankTxnDate,
         },
       ]);
     });

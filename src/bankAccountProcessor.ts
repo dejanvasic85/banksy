@@ -4,7 +4,6 @@ import { reconcile } from './reconciler';
 import logger from './logger';
 import { UserConfig, TransactionsMessage, BankAccount, BankAccountCrawler, PublisherConfig } from './types';
 import { publish } from './publisher';
-import { getStartOfMonth } from './startOfMonth';
 
 export const processBankAccount = async (
   username: string,
@@ -17,23 +16,31 @@ export const processBankAccount = async (
     logger.info(`bankAccountProcessor: Processing account ${account.accountName}`);
     const { accountName } = account;
     const accountReader = await bankCrawler.getAccountReader(account);
-    const cached = await getTransactions(bankId, accountName, username);
+    const cachedTransactions = await getTransactions(bankId, accountName, username);
 
     const bankTransactions = await accountReader.getBankTransactions();
-    const newTransactions = reconcile({
-      cachedTransactions: cached,
+
+    const { newTxns, matchingTxns, duplicateTxns } = reconcile({
+      cachedTransactions,
       bankTransactions,
-      startOfMonth: getStartOfMonth(),
     });
 
-    if (newTransactions.length > 0) {
-      logger.info(`bankAccountProcessor: New Transactions. Found total of ${newTransactions.length}`);
-      await createTransactions(bankId, accountName, username, newTransactions);
+    logger.info('bankAccountProcessor: Finished Reconciling', {
+      newTxnsCount: newTxns.length,
+      matchingTxnsCount: newTxns.length,
+      duplicateTxnsCount: duplicateTxns.length,
+    });
+
+    if (newTxns.length > 0) {
+      logger.info(`bankAccountProcessor: New Transactions. Found total of ${newTxns.length}`);
+      await createTransactions(bankId, accountName, username, newTxns);
       const message: TransactionsMessage = {
         username,
         bankId,
         accountName,
-        transactions: newTransactions,
+        newTxns,
+        duplicateTxns,
+        matchingTxns,
       };
       await publish(publisherConfig, message);
     }

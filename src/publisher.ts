@@ -21,7 +21,7 @@ export const publishToSns = async (topicArn, message: TransactionsMessage): Prom
 
   try {
     logger.info(
-      `Publishing to ${topicArn}. Details: ${message.bankId}, ${message.accountName}, ${message.username}, Transactions count [${message.transactions.length}]`,
+      `Publishing to ${topicArn}. Bank: ${message.bankId}. Account Name: ${message.accountName}. Usernmae: ${message.username}`,
     );
     await sns.publish(params).promise();
     return true;

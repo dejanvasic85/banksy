@@ -1,48 +1,78 @@
-import { BankTransaction } from './types';
 import * as moment from 'moment';
 
-export interface ReconcileParams {
-  startOfMonth: moment.Moment;
-  cachedTransactions: BankTransaction[];
-  bankTransactions: BankTransaction[];
-}
+import { BankTransaction, ReconcileResult, ReconcileParams } from './types';
+import { config } from './config';
 
-const clean = (str: string): string => {
-  if (!str) return '';
+const cleanForStorage = (str: string): string => {
   return str
-    .toLowerCase()
-    .replace('pending', '')
-    .replace('-', '')
+    .replace(/pending/gi, '')
+    .replace(/-/g, '')
     .trim();
-}; 
+};
 
-const areEqual = (existingTxn: BankTransaction, accountTxn: BankTransaction) => {
-  if (!existingTxn || !accountTxn) {
+const cleanForCompare = (str: string): string => {
+  if (!str) return '';
+  return str.toLowerCase().trim();
+};
+
+const areEqual = (cachedTxn: BankTransaction, bankTxn: BankTransaction) => {
+  if (!cachedTxn || !bankTxn) {
     return false;
   }
 
+  const isTheSameDay = moment(bankTxn.date).diff(cachedTxn.date, 'days') === 0;
+
   return (
-    existingTxn.amount === accountTxn.amount &&
-    clean(existingTxn.description) === clean(accountTxn.description) &&
-    existingTxn.date === accountTxn.date
+    cachedTxn.amount === bankTxn.amount &&
+    cleanForCompare(cachedTxn.description) === cleanForCompare(bankTxn.description) &&
+    isTheSameDay
   );
 };
 
-export const reconcile = ({
-  startOfMonth,
-  cachedTransactions,
-  bankTransactions,
-}: ReconcileParams): BankTransaction[] => {
-  if (bankTransactions.length === 0) {
-    return [];
+const areSimilar = (cachedTxn: BankTransaction, bankTxn: BankTransaction) => {
+  if (!cachedTxn || !bankTxn) {
+    return false;
   }
 
-  if (!cachedTransactions) {
-    // return all
-    return bankTransactions;
+  const daysDiff = moment(bankTxn.date).diff(cachedTxn.date, 'days');
+  const isInDateRange = daysDiff > 0 && daysDiff <= config.daysToMatchDuplicateTxns;
+  const cachedDescription = cleanForCompare(cachedTxn.description).substr(0, 10);
+  const bankDescription = cleanForCompare(bankTxn.description).substr(0, 10);
+
+  return cachedTxn.amount === bankTxn.amount && cachedDescription === bankDescription && isInDateRange;
+};
+
+export const reconcile = ({ cachedTransactions, bankTransactions }: ReconcileParams): ReconcileResult => {
+  const result = {
+    newTxns: [],
+    duplicateTxns: [],
+    matchingTxns: [],
+  };
+
+  if (!bankTransactions || bankTransactions.length === 0) {
+    return result;
   }
 
-  return bankTransactions
-    .filter(({ date }) => moment(date).isSameOrAfter(startOfMonth))
-    .filter(bt => !cachedTransactions.some(tt => areEqual(tt, bt)));
+  // Fixes up the description for the incoming bank transactions (e.g. Pending... )
+  const cleanedBankTxns = bankTransactions
+    .filter(bt => bt.amount)
+    .map(bt => {
+      return {
+        ...bt,
+        description: cleanForStorage(bt.description),
+      };
+    });
+
+  var value = cleanedBankTxns.reduce((prev: ReconcileResult, currentBankTxn: BankTransaction) => {
+    const matching = cachedTransactions.find(cached => areEqual(cached, currentBankTxn));
+    const duplicate = !matching ? cachedTransactions.find(cached => areSimilar(cached, currentBankTxn)) : null;
+
+    return {
+      newTxns: [...prev.newTxns, !matching && !duplicate ? currentBankTxn : null].filter(Boolean),
+      matchingTxns: [...prev.matchingTxns, matching ? currentBankTxn : null].filter(Boolean),
+      duplicateTxns: [...prev.duplicateTxns, duplicate ? currentBankTxn : null].filter(Boolean),
+    };
+  }, result);
+
+  return value;
 };

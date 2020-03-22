@@ -5,7 +5,6 @@ import * as bankAccountProcessor from '../src/bankAccountProcessor';
 import * as bankAccountFactory from '../src/bankAccountFactory';
 import * as userRepository from '../src/db';
 import * as reconciler from '../src/reconciler';
-import * as startOfMonth from '../src/startOfMonth';
 import * as publisher from '../src/publisher';
 import logger from '../src/logger';
 
@@ -30,7 +29,6 @@ describe('bankAccountProcessor', () => {
   let getTransactionsStub: any;
   let createTransactionsStub: any;
   let reconcileStub: any;
-  let startOfMonthStub: any;
   let getBankTransactionsStub: any;
   let publishStub: any;
   let loggerErrorStub: any;
@@ -56,7 +54,6 @@ describe('bankAccountProcessor', () => {
     getTransactionsStub = stub(userRepository, 'getTransactions');
     createTransactionsStub = stub(userRepository, 'createTransactions');
     reconcileStub = stub(reconciler, 'reconcile');
-    startOfMonthStub = stub(startOfMonth, 'getStartOfMonth');
     publishStub = stub(publisher, 'publish');
     loggerErrorStub = stub(logger, 'error');
     loggerInfoStub = stub(logger, 'info');
@@ -68,7 +65,6 @@ describe('bankAccountProcessor', () => {
     getTransactionsStub.resetHistory();
     createTransactionsStub.resetHistory();
     reconcileStub.resetHistory();
-    startOfMonthStub.resetHistory();
     getBankTransactionsStub.resetHistory();
     publishStub.resetHistory();
     loggerErrorStub.resetHistory();
@@ -84,7 +80,6 @@ describe('bankAccountProcessor', () => {
     getTransactionsStub.restore();
     createTransactionsStub.restore();
     reconcileStub.restore();
-    startOfMonthStub.restore();
     publishStub.restore();
     loggerErrorStub.restore();
     loggerInfoStub.restore();
@@ -138,7 +133,10 @@ describe('bankAccountProcessor', () => {
       it('should not publish the message', async () => {
         getBankTransactionsStub.resolves([]);
         getTransactionsStub.resolves([]);
-        reconcileStub.returns([]);
+        reconcileStub.returns({
+          duplicates: [],
+          newTransactions: [],
+        });
 
         await bankAccountProcessor.processBankAccount(username, bankId, account, bankCrawlerStub, publisherConfig);
 
@@ -160,34 +158,33 @@ describe('bankAccountProcessor', () => {
         expect(createTransactionsStub.called).to.equal(false);
         expect(publishStub.called).to.equal(false);
         expect(bankCrawlerStub.screenshot.called).to.equal(true);
-        expect(loggerErrorStub.getCall(0).args).to.eql(['bankAccountProcessor: An error occurred while processing.', accountReadErr]);
+        expect(loggerErrorStub.getCall(0).args).to.eql([
+          'bankAccountProcessor: An error occurred while processing.',
+          accountReadErr,
+        ]);
       });
     });
 
     describe('when the reconciler finds new transactions', () => {
       it('should call the publisher', async () => {
-        const newTransactions = [
-          {
-            amount: 2,
-            date: 'yesterday',
-            description: 'kfc',
-          },
-        ];
-        const cachedTransactions = [
-          {
-            amount: 1,
-            date: 'today',
-            description: 'mcdonalds',
-          },
-        ];
+        const newTxn = {
+          amount: 2,
+          date: 'yesterday',
+          description: 'kfc',
+        };
 
-        getBankTransactionsStub.resolves(newTransactions);
-        getTransactionsStub.resolves({
-          _id: 'cached-key',
-          transactions: cachedTransactions,
+        const duplicate = {
+          amount: 1,
+          date: 'today',
+          description: 'mcdonalds',
+        };
+
+        getBankTransactionsStub.resolves([newTxn, duplicate]);
+        getTransactionsStub.resolves([duplicate]);
+        reconcileStub.returns({
+          newTransactions: [newTxn],
+          duplicates: [duplicate],
         });
-        reconcileStub.returns(newTransactions);
-        startOfMonthStub.returns('today');
 
         await bankAccountProcessor.processBankAccount(username, bankId, account, bankCrawlerStub, publisherConfig);
 
@@ -199,20 +196,16 @@ describe('bankAccountProcessor', () => {
             accountName: 'bankAccount',
             bankId: 'bank321',
             username: 'user123',
-            transactions: [
-              {
-                amount: 2,
-                date: 'yesterday',
-                description: 'kfc',
-              },
-            ],
+            transactions: [newTxn],
+            duplicates: [duplicate],
           },
         ]);
-        expect(reconcileStub.getCall(0).args).to.eql([{
-          cachedTransactions,
-          bankTransactions: newTransactions,
-          startOfMonth: 'today'
-        }]);
+        expect(reconcileStub.getCall(0).args).to.eql([
+          {
+            cachedTransactions: [duplicate],
+            bankTransactions: [newTxn, duplicate],
+          },
+        ]);
       });
     });
   });

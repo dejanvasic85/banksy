@@ -42,4 +42,7 @@ export const config: Config = {
     database: PGDATABASE,
     port: Number(PGPORT || 5432),
   },
+
+  daysToFetchCachedTxns: 15,
+  daysToMatchDuplicateTxns: 5,
 };
