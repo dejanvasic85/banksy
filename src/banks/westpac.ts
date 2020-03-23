@@ -59,9 +59,7 @@ export const withoutSpaces = (str: string): string => {
 };
 
 export const cleanDescription = (str: string): string => {
-  return [withoutAuPostfix, withoutDirectDebitPurchase, withoutSpaces].reduce((prev, curr) => {
-    return curr(prev);
-  }, str);
+  return [withoutAuPostfix, withoutDirectDebitPurchase, withoutSpaces].reduce((prev, curr) => curr(prev), str);
 };
 
 export const westpacAccountReader = (driver: WebDriver, account: BankAccount): BankAccountReader => {
