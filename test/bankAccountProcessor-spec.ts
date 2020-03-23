@@ -166,7 +166,7 @@ describe('bankAccountProcessor', () => {
     });
 
     describe('when the reconciler finds new transactions', () => {
-      it('should call the publisher', async () => {
+      it('should call the publisher and create transactions', async () => {
         const newTxn = {
           amount: 2,
           date: 'yesterday',
@@ -182,8 +182,9 @@ describe('bankAccountProcessor', () => {
         getBankTransactionsStub.resolves([newTxn, duplicate]);
         getTransactionsStub.resolves([duplicate]);
         reconcileStub.returns({
-          newTransactions: [newTxn],
-          duplicates: [duplicate],
+          newTxns: [newTxn],
+          duplicateTxns: [duplicate],
+          matchingTxns: [],
         });
 
         await bankAccountProcessor.processBankAccount(username, bankId, account, bankCrawlerStub, publisherConfig);
@@ -196,8 +197,9 @@ describe('bankAccountProcessor', () => {
             accountName: 'bankAccount',
             bankId: 'bank321',
             username: 'user123',
-            transactions: [newTxn],
-            duplicates: [duplicate],
+            newTxns: [newTxn],
+            duplicateTxns: [duplicate],
+            matchingTxns: [],
           },
         ]);
         expect(reconcileStub.getCall(0).args).to.eql([

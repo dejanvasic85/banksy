@@ -6,6 +6,7 @@ import { config } from './config';
 const cleanForStorage = (str: string): string => {
   return str
     .replace(/pending/gi, '')
+    .replace(/debit card purchase/gi, '')
     .replace(/-/g, '')
     .trim();
 };

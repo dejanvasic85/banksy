@@ -4,7 +4,7 @@ import { config } from '../src/config';
 
 import { reconcile } from '../src/reconciler';
 
-describe.only('reconcile', () => {
+describe('reconcile', () => {
   describe('when cache and new transactions are empty', () => {
     it('should return empty array', () => {
       const { newTxns, matchingTxns, duplicateTxns } = reconcile({
@@ -78,8 +78,8 @@ describe.only('reconcile', () => {
     });
   });
 
-  describe('when the description contains pending', () => {
-    it('should return duplicate transaction', () => {
+  describe('when the description contains PENDING or DEBIT CARD PURCHASE', () => {
+    it('should return matching transaction', () => {
       const cachedTransactions = [
         {
           amount: 300,
@@ -89,6 +89,11 @@ describe.only('reconcile', () => {
         {
           amount: 200,
           description: 'Kfc',
+          date: '2020-03-14T13:00:00.000Z',
+        },
+        {
+          amount: 400,
+          description: 'ALDI Stores Burnside AUS',
           date: '2020-03-14T13:00:00.000Z',
         },
       ];
@@ -102,6 +107,11 @@ describe.only('reconcile', () => {
         {
           amount: 200,
           description: 'PENDING  - KFC',
+          date: '2020-03-14T13:00:00.000Z',
+        },
+        {
+          amount: 400,
+          description: 'debit card purchase ALDI STORES BURNSIDE AUS',
           date: '2020-03-14T13:00:00.000Z',
         },
       ];
@@ -121,12 +131,17 @@ describe.only('reconcile', () => {
           description: 'KFC',
           date: '2020-03-14T13:00:00.000Z',
         },
+        {
+          amount: 400,
+          description: 'ALDI STORES BURNSIDE AUS',
+          date: '2020-03-14T13:00:00.000Z',
+        },
       ]);
     });
   });
 
   describe('when the description is different', () => {
-    it('should return the new transaction', () => {
+    it('should return new transaction', () => {
       const txn = {
         amount: 300,
         description: 'mcdonalds',
