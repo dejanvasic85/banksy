@@ -8,6 +8,7 @@ import * as moment from 'moment';
 
 const DATE_FORMAT = 'DD MMM YYYY';
 export const WESTPAC_IGNORED_TEXT_TXN = 'TRANSACTION DETAILS AVAILABLE NEXT BUSINESS DAY';
+export const WESTPAC_MAX_DAYS = 14;
 
 const LOGIN_PAGE_URL =
   'https://banking.westpac.com.au/wbc/banking/handler?TAM_OP=login&URL=%2Fsecure%2Fbanking%2Foverview%2Fdashboard&logout=false';
@@ -93,10 +94,9 @@ export const westpacAccountReader = (driver: WebDriver, account: BankAccount): B
         });
       }
 
-      // Only return the last 14 days
       return txns
         .filter(bt => bt.description && bt.description.indexOf(WESTPAC_IGNORED_TEXT_TXN) !== 0)
-        .filter(bt => moment().diff(moment(bt.date), 'days') <= 14)
+        .filter(bt => moment().diff(moment(bt.date), 'days') <= WESTPAC_MAX_DAYS)
         .map(bt => ({ ...bt, description: cleanDescription(bt.description) }));
     },
   };
