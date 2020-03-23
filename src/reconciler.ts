@@ -3,6 +3,8 @@ import * as moment from 'moment';
 import { BankTransaction, ReconcileResult, ReconcileParams } from './types';
 import { config } from './config';
 
+const WESTPAC_IGNORED_TEXT_TXN = 'TRANSACTION DETAILS AVAILABLE NEXT BUSINESS DAY';
+
 const cleanForStorage = (str: string): string => {
   return str
     .replace(/pending/gi, '')
@@ -57,6 +59,7 @@ export const reconcile = ({ cachedTransactions, bankTransactions }: ReconcilePar
   // Fixes up the description for the incoming bank transactions (e.g. Pending... )
   const cleanedBankTxns = bankTransactions
     .filter(bt => bt.amount)
+    .filter(bt => bt.description && bt.description.indexOf(WESTPAC_IGNORED_TEXT_TXN) !== 0)
     .map(bt => {
       return {
         ...bt,

@@ -18,6 +18,25 @@ describe('reconcile', () => {
     });
   });
 
+  describe(`when the description contains 'transaction details available next business day'`, () => {
+    it('should be ignored and not processed', () => {
+      const { newTxns, matchingTxns, duplicateTxns } = reconcile({
+        cachedTransactions: [],
+        bankTransactions: [
+          {
+            amount: 100,
+            description: 'TRANSACTION DETAILS AVAILABLE NEXT BUSINESS DAY',
+            date: '2020-03-14T13:00:00.000Z',
+          },
+        ],
+      });
+
+      expect(newTxns).to.have.lengthOf(0);
+      expect(matchingTxns).to.have.lengthOf(0);
+      expect(duplicateTxns).to.have.lengthOf(0);
+    });
+  });
+
   describe('when the amounts are different', () => {
     it('should return new transaction', () => {
       const txn = {
