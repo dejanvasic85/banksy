@@ -9,9 +9,7 @@ import * as moment from 'moment';
 const DATE_FORMAT = 'DD MMM YYYY';
 export const WESTPAC_IGNORED_TEXT_TXN = 'TRANSACTION DETAILS AVAILABLE NEXT BUSINESS DAY';
 export const WESTPAC_MAX_DAYS = 14;
-
-const LOGIN_PAGE_URL =
-  'https://banking.westpac.com.au/wbc/banking/handler?TAM_OP=login&URL=%2Fsecure%2Fbanking%2Foverview%2Fdashboard&logout=false';
+export const LOGIN_PAGE_URL = 'https://banking.westpac.com.au/wbc/banking/handler?TAM_OP=login&URL=%2Fsecure%2Fbanking%2Foverview%2Fdashboard&logout=false';
 
 interface WestpacCredentials {
   customerId: string;
