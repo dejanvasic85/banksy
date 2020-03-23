@@ -7,9 +7,9 @@ import logger from '../logger';
 import * as moment from 'moment';
 
 const DATE_FORMAT = 'DD MMM YYYY';
-
-const LOGIN_PAGE_URL =
-  'https://banking.westpac.com.au/wbc/banking/handler?TAM_OP=login&URL=%2Fsecure%2Fbanking%2Foverview%2Fdashboard&logout=false';
+export const WESTPAC_IGNORED_TEXT_TXN = 'TRANSACTION DETAILS AVAILABLE NEXT BUSINESS DAY';
+export const WESTPAC_MAX_DAYS = 14;
+export const LOGIN_PAGE_URL = 'https://banking.westpac.com.au/wbc/banking/handler?TAM_OP=login&URL=%2Fsecure%2Fbanking%2Foverview%2Fdashboard&logout=false';
 
 interface WestpacCredentials {
   customerId: string;
@@ -17,11 +17,13 @@ interface WestpacCredentials {
 }
 
 const parseTextToAmount = (text: string): number => {
-  const cleaned = text.trim().replace('$', '');
+  const cleaned = text
+    .trim()
+    .replace('$', '')
+    .replace(/,/g, '');
 
   return parseFloat(cleaned);
 };
-
 
 export const parseDate = (date: string): moment.Moment => {
   return moment(date, DATE_FORMAT);
@@ -33,6 +35,30 @@ export const westpacCredentialReader = (key: string): WestpacCredentials => {
     customerId,
     password,
   };
+};
+
+export const withoutAuPostfix = (str: string): string => {
+  if (str.substr(str.length - 2).toUpperCase() === 'AU') {
+    return str.substr(0, str.length - 2);
+  }
+
+  if (str.substr(str.length - 3).toUpperCase() === 'AUS') {
+    return str.substr(0, str.length - 3);
+  }
+
+  return str;
+};
+
+export const withoutDirectDebitPurchase = (str: string): string => {
+  return str.replace(/debit card purchase/gi, '');
+};
+
+export const withoutSpaces = (str: string): string => {
+  return str.trim();
+};
+
+export const cleanDescription = (str: string): string => {
+  return [withoutAuPostfix, withoutDirectDebitPurchase, withoutSpaces].reduce((prev, curr) => curr(prev), str);
 };
 
 export const westpacAccountReader = (driver: WebDriver, account: BankAccount): BankAccountReader => {
@@ -57,15 +83,19 @@ export const westpacAccountReader = (driver: WebDriver, account: BankAccount): B
 
         const amountSpan = await row.findElement(By.css('span[data-bind="html: Amount"]'));
         const amountText = await amountSpan.getText();
+        const amount = parseTextToAmount(amountText);
 
         txns.push({
-          amount: parseTextToAmount(amountText),
+          amount,
           date: parsedDate.format(),
           description,
         });
       }
 
-      return txns;
+      return txns
+        .filter(bt => bt.description && bt.description.indexOf(WESTPAC_IGNORED_TEXT_TXN) !== 0)
+        .filter(bt => moment().diff(moment(bt.date), 'days') <= WESTPAC_MAX_DAYS)
+        .map(bt => ({ ...bt, description: cleanDescription(bt.description) }));
     },
   };
 };

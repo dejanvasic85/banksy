@@ -4,7 +4,7 @@ import { config } from '../src/config';
 
 import { reconcile } from '../src/reconciler';
 
-describe.only('reconcile', () => {
+describe('reconcile', () => {
   describe('when cache and new transactions are empty', () => {
     it('should return empty array', () => {
       const { newTxns, matchingTxns, duplicateTxns } = reconcile({
@@ -78,55 +78,8 @@ describe.only('reconcile', () => {
     });
   });
 
-  describe('when the description contains pending', () => {
-    it('should return duplicate transaction', () => {
-      const cachedTransactions = [
-        {
-          amount: 300,
-          description: 'McDonalds',
-          date: '2020-03-14T13:00:00.000Z',
-        },
-        {
-          amount: 200,
-          description: 'Kfc',
-          date: '2020-03-14T13:00:00.000Z',
-        },
-      ];
-
-      const bankTransactions = [
-        {
-          amount: 300,
-          description: 'pending - McDonalds',
-          date: '2020-03-14T13:00:00.000Z',
-        },
-        {
-          amount: 200,
-          description: 'PENDING  - KFC',
-          date: '2020-03-14T13:00:00.000Z',
-        },
-      ];
-
-      const { matchingTxns, newTxns, duplicateTxns } = reconcile({ cachedTransactions, bankTransactions });
-
-      expect(newTxns).to.have.lengthOf(0);
-      expect(duplicateTxns).to.have.lengthOf(0);
-      expect(matchingTxns).to.eql([
-        {
-          amount: 300,
-          description: 'McDonalds',
-          date: '2020-03-14T13:00:00.000Z',
-        },
-        {
-          amount: 200,
-          description: 'KFC',
-          date: '2020-03-14T13:00:00.000Z',
-        },
-      ]);
-    });
-  });
-
   describe('when the description is different', () => {
-    it('should return the new transaction', () => {
+    it('should return new transaction', () => {
       const txn = {
         amount: 300,
         description: 'mcdonalds',

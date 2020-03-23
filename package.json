@@ -5,11 +5,12 @@
   "main": "handler.js",
   "scripts": {
     "test": "mocha -r ts-node/register ./test/*-spec.ts",
-    "test:integration": "mocha -r ts-node/register ./integration-tests/db-pg.ts --timeout 60000",
+    "test:integration": "mocha -r ts-node/register ./integration-tests/banks.ts --timeout 60000",
     "test:single": "mocha -r ts-node/register ./test/$test*-spec.ts --watch-extensions ts --w",
     "start": "ts-node ./src/index.ts",
     "build": "tsc",
-    "credentials": "ts-node ./src/generateCredentials.ts"
+    "credentials": "ts-node ./src/generateCredentials.ts",
+    "migrate": "ts-node ./integration-tests/migrate.ts"
   },
   "keywords": [],
   "author": "",
@@ -23,7 +24,8 @@
     "pg": "^7.18.2",
     "selenium-webdriver": "^4.0.0-alpha.5",
     "winston": "^3.2.1",
-    "winston-aws-cloudwatch": "^3.0.0"
+    "winston-aws-cloudwatch": "^3.0.0",
+    "ynab": "^1.18.0"
   },
   "devDependencies": {
     "@types/chai": "4.2.11",

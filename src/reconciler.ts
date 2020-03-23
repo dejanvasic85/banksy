@@ -3,13 +3,6 @@ import * as moment from 'moment';
 import { BankTransaction, ReconcileResult, ReconcileParams } from './types';
 import { config } from './config';
 
-const cleanForStorage = (str: string): string => {
-  return str
-    .replace(/pending/gi, '')
-    .replace(/-/g, '')
-    .trim();
-};
-
 const cleanForCompare = (str: string): string => {
   if (!str) return '';
   return str.toLowerCase().trim();
@@ -53,24 +46,14 @@ export const reconcile = ({ cachedTransactions, bankTransactions }: ReconcilePar
     return result;
   }
 
-  // Fixes up the description for the incoming bank transactions (e.g. Pending... )
-  const cleanedBankTxns = bankTransactions
-    .filter(bt => bt.amount)
-    .map(bt => {
-      return {
-        ...bt,
-        description: cleanForStorage(bt.description),
-      };
-    });
-
-  var value = cleanedBankTxns.reduce((prev: ReconcileResult, currentBankTxn: BankTransaction) => {
-    const matching = cachedTransactions.find(cached => areEqual(cached, currentBankTxn));
-    const duplicate = !matching ? cachedTransactions.find(cached => areSimilar(cached, currentBankTxn)) : null;
+  var value = bankTransactions.reduce((prev: ReconcileResult, currentTxn: BankTransaction) => {
+    const matching = cachedTransactions.find(cached => areEqual(cached, currentTxn));
+    const duplicate = !matching ? cachedTransactions.find(cached => areSimilar(cached, currentTxn)) : null;
 
     return {
-      newTxns: [...prev.newTxns, !matching && !duplicate ? currentBankTxn : null].filter(Boolean),
-      matchingTxns: [...prev.matchingTxns, matching ? currentBankTxn : null].filter(Boolean),
-      duplicateTxns: [...prev.duplicateTxns, duplicate ? currentBankTxn : null].filter(Boolean),
+      newTxns: [...prev.newTxns, !matching && !duplicate ? currentTxn : null].filter(Boolean),
+      matchingTxns: [...prev.matchingTxns, matching ? currentTxn : null].filter(Boolean),
+      duplicateTxns: [...prev.duplicateTxns, duplicate ? currentTxn : null].filter(Boolean),
     };
   }, result);
 
