@@ -18,25 +18,6 @@ describe('reconcile', () => {
     });
   });
 
-  describe(`when the description contains 'transaction details available next business day'`, () => {
-    it('should be ignored and not processed', () => {
-      const { newTxns, matchingTxns, duplicateTxns } = reconcile({
-        cachedTransactions: [],
-        bankTransactions: [
-          {
-            amount: 100,
-            description: 'TRANSACTION DETAILS AVAILABLE NEXT BUSINESS DAY',
-            date: '2020-03-14T13:00:00.000Z',
-          },
-        ],
-      });
-
-      expect(newTxns).to.have.lengthOf(0);
-      expect(matchingTxns).to.have.lengthOf(0);
-      expect(duplicateTxns).to.have.lengthOf(0);
-    });
-  });
-
   describe('when the amounts are different', () => {
     it('should return new transaction', () => {
       const txn = {
@@ -91,68 +72,6 @@ describe('reconcile', () => {
         {
           amount: 300,
           description: 'McDonalds',
-          date: '2020-03-14T13:00:00.000Z',
-        },
-      ]);
-    });
-  });
-
-  describe('when the description contains PENDING or DEBIT CARD PURCHASE', () => {
-    it('should return matching transaction', () => {
-      const cachedTransactions = [
-        {
-          amount: 300,
-          description: 'McDonalds',
-          date: '2020-03-14T13:00:00.000Z',
-        },
-        {
-          amount: 200,
-          description: 'Kfc',
-          date: '2020-03-14T13:00:00.000Z',
-        },
-        {
-          amount: 400,
-          description: 'ALDI Stores Burnside AUS',
-          date: '2020-03-14T13:00:00.000Z',
-        },
-      ];
-
-      const bankTransactions = [
-        {
-          amount: 300,
-          description: 'pending - McDonalds',
-          date: '2020-03-14T13:00:00.000Z',
-        },
-        {
-          amount: 200,
-          description: 'PENDING  - KFC',
-          date: '2020-03-14T13:00:00.000Z',
-        },
-        {
-          amount: 400,
-          description: 'debit card purchase ALDI STORES BURNSIDE AUS',
-          date: '2020-03-14T13:00:00.000Z',
-        },
-      ];
-
-      const { matchingTxns, newTxns, duplicateTxns } = reconcile({ cachedTransactions, bankTransactions });
-
-      expect(newTxns).to.have.lengthOf(0);
-      expect(duplicateTxns).to.have.lengthOf(0);
-      expect(matchingTxns).to.eql([
-        {
-          amount: 300,
-          description: 'McDonalds',
-          date: '2020-03-14T13:00:00.000Z',
-        },
-        {
-          amount: 200,
-          description: 'KFC',
-          date: '2020-03-14T13:00:00.000Z',
-        },
-        {
-          amount: 400,
-          description: 'ALDI STORES BURNSIDE AUS',
           date: '2020-03-14T13:00:00.000Z',
         },
       ]);
