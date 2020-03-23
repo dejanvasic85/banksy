@@ -14,12 +14,10 @@ const areEqual = (cachedTxn: BankTransaction, bankTxn: BankTransaction) => {
   }
 
   const isTheSameDay = moment(bankTxn.date).diff(cachedTxn.date, 'days') === 0;
+  const isTheSameAmount = cachedTxn.amount === bankTxn.amount;
+  const isTheSameDesc = cleanForCompare(cachedTxn.description) === cleanForCompare(bankTxn.description);
 
-  return (
-    cachedTxn.amount === bankTxn.amount &&
-    cleanForCompare(cachedTxn.description) === cleanForCompare(bankTxn.description) &&
-    isTheSameDay
-  );
+  return isTheSameAmount && isTheSameDesc && isTheSameDay;
 };
 
 const areSimilar = (cachedTxn: BankTransaction, bankTxn: BankTransaction) => {

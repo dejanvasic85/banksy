@@ -38,7 +38,7 @@ export const maxxiaAccountReader = (driver: WebDriver, account: BankAccount): Ba
 
           return {
             amount,
-            description,
+            description: description.trim(),
             date: parsedDate.format(),
           };
         }),
@@ -59,7 +59,7 @@ export const maxxiaCrawler = async (credentials: string): Promise<BankAccountCra
 
       // Sometimes a little dialog appears after 2 seconds. Check if that is the case and close it first
       await pause(3000);
-      
+
       const closeBtn = await driver.findElements(By.css('.norfolk-ClosePosition--top-right > svg'));
       if (closeBtn.length > 0) {
         await closeBtn[0].click();
