@@ -43,6 +43,6 @@ export const config: Config = {
     port: Number(PGPORT || 5432),
   },
 
-  daysToFetchCachedTxns: 20,
+  daysToFetchCachedTxns: 40,
   daysToMatchDuplicateTxns: 5,
 };

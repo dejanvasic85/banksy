@@ -16,7 +16,6 @@ const areEqual = (cachedTxn: BankTransaction, bankTxn: BankTransaction) => {
   const isTheSameDay = moment(bankTxn.date).diff(cachedTxn.date, 'days') === 0;
   const isTheSameAmount = cachedTxn.amount === bankTxn.amount;
   const isTheSameDesc = cleanForCompare(cachedTxn.description) === cleanForCompare(bankTxn.description);
-
   return isTheSameAmount && isTheSameDesc && isTheSameDay;
 };
 
@@ -46,7 +45,7 @@ export const reconcile = ({ cachedTransactions, bankTransactions }: ReconcilePar
 
   var value = bankTransactions.reduce((prev: ReconcileResult, currentTxn: BankTransaction) => {
     const matching = cachedTransactions.find(cached => areEqual(cached, currentTxn));
-    const duplicate = !matching ? cachedTransactions.find(cached => areSimilar(cached, currentTxn)) : null;
+    const duplicate = matching ? null : cachedTransactions.find(cached => areSimilar(cached, currentTxn));
 
     return {
       newTxns: [...prev.newTxns, !matching && !duplicate ? currentTxn : null].filter(Boolean),
