@@ -97,12 +97,7 @@ const getTransactions = async (
   }
 
   const firstItemText = await rows[0].getText();
-  if (
-    firstItemText
-      .trim()
-      .toLowerCase()
-      .indexOf('no transactions found') > -1
-  ) {
+  if (firstItemText.trim().toLowerCase().indexOf('no transactions found') > -1) {
     logger.info(`bom: No transactions found`);
     return [];
   }
@@ -126,7 +121,7 @@ const getTransactions = async (
     }),
   );
 
-  return txns.filter(Boolean);
+  return txns.filter(Boolean).filter((t) => t.amount && t.description && t.date);
 };
 
 export const bomAccountReader = (driver: WebDriver, account: BankAccount): BankAccountReader => {
@@ -165,7 +160,9 @@ export const bomCrawler = async (credentials: string): Promise<BankAccountCrawle
       const viewAccountElement = await driver.wait(until.elementLocated(By.css('a[href="viewAccountPortfolio.html')));
       await viewAccountElement.click();
 
-      const accountNameLink = await driver.wait(until.elementLocated(By.css(`[data-acctalias="${account.accountName}"] > h2 > a`)));;
+      const accountNameLink = await driver.wait(
+        until.elementLocated(By.css(`[data-acctalias="${account.accountName}"] > h2 > a`)),
+      );
       await accountNameLink.click();
 
       return bomAccountReader(driver, account);
