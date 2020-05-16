@@ -23,5 +23,10 @@ describe('westpac', () => {
       const result = cleanDescription('WOOLWORTHS 3802 TAYLOR LAKVI AUS');
       expect(result).to.equal('WOOLWORTHS 3802 TAYLOR LAKVI');
     });
+
+    it('should remove the DEPOSIT-SALARY text from description', () => {
+      const result = cleanDescription('DEPOSIT-SALARY MELBOURNE HEALTH 0534783734');
+      expect(result).to.equal('MELBOURNE HEALTH 0534783734');
+    });
   });
 });

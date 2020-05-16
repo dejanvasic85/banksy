@@ -9,7 +9,8 @@ import * as moment from 'moment';
 const DATE_FORMAT = 'DD MMM YYYY';
 export const WESTPAC_IGNORED_TEXT_TXN = 'TRANSACTION DETAILS AVAILABLE NEXT BUSINESS DAY';
 export const WESTPAC_MAX_DAYS = 14;
-export const LOGIN_PAGE_URL = 'https://banking.westpac.com.au/wbc/banking/handler?TAM_OP=login&URL=%2Fsecure%2Fbanking%2Foverview%2Fdashboard&logout=false';
+export const LOGIN_PAGE_URL =
+  'https://banking.westpac.com.au/wbc/banking/handler?TAM_OP=login&URL=%2Fsecure%2Fbanking%2Foverview%2Fdashboard&logout=false';
 
 interface WestpacCredentials {
   customerId: string;
@@ -17,10 +18,7 @@ interface WestpacCredentials {
 }
 
 const parseTextToAmount = (text: string): number => {
-  const cleaned = text
-    .trim()
-    .replace('$', '')
-    .replace(/,/g, '');
+  const cleaned = text.trim().replace('$', '').replace(/,/g, '');
 
   return parseFloat(cleaned);
 };
@@ -57,8 +55,15 @@ export const withoutSpaces = (str: string): string => {
   return str.trim();
 };
 
+export const withoutDepositSalary = (str: string): string => {
+  return str.replace(/deposit-salary/gi, '');
+};
+
 export const cleanDescription = (str: string): string => {
-  return [withoutAuPostfix, withoutDirectDebitPurchase, withoutSpaces].reduce((prev, curr) => curr(prev), str);
+  return [withoutAuPostfix, withoutDirectDebitPurchase, withoutDepositSalary, withoutSpaces].reduce(
+    (prev, curr) => curr(prev),
+    str,
+  );
 };
 
 export const westpacAccountReader = (driver: WebDriver, account: BankAccount): BankAccountReader => {
@@ -93,9 +98,9 @@ export const westpacAccountReader = (driver: WebDriver, account: BankAccount): B
       }
 
       return txns
-        .filter(bt => bt.description && bt.description.indexOf(WESTPAC_IGNORED_TEXT_TXN) !== 0)
-        .filter(bt => moment().diff(moment(bt.date), 'days') <= WESTPAC_MAX_DAYS)
-        .map(bt => ({ ...bt, description: cleanDescription(bt.description) }));
+        .filter((bt) => bt.description && bt.description.indexOf(WESTPAC_IGNORED_TEXT_TXN) !== 0)
+        .filter((bt) => moment().diff(moment(bt.date), 'days') <= WESTPAC_MAX_DAYS)
+        .map((bt) => ({ ...bt, description: cleanDescription(bt.description) }));
     },
   };
 };
