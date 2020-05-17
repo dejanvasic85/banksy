@@ -18,3 +18,5 @@ secret-*
 
 screenshots/
 integration-tests/
+
+start.bat
