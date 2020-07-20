@@ -19,7 +19,6 @@ export interface Config {
   };
 
   daysToFetchCachedTxns: number;
-  daysToMatchDuplicateTxns: number;
 }
 
 export interface BankAccount {
@@ -69,8 +68,6 @@ export interface TransactionsMessage {
   bankId: string;
   accountName: string;
   newTxns: BankTransaction[];
-  matchingTxns: BankTransaction[];
-  duplicateTxns: BankTransaction[];
 }
 
 export interface ColumnIndexes {
@@ -87,6 +84,4 @@ export interface ReconcileParams {
 
 export interface ReconcileResult {
   newTxns: BankTransaction[];
-  duplicateTxns: BankTransaction[];
-  matchingTxns: BankTransaction[];
 }

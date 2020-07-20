@@ -44,5 +44,4 @@ export const config: Config = {
   },
 
   daysToFetchCachedTxns: 40,
-  daysToMatchDuplicateTxns: 5,
 };

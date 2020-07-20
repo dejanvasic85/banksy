@@ -127,19 +127,11 @@ const getTransactions = async (
 export const bomAccountReader = (driver: WebDriver, account: BankAccount): BankAccountReader => {
   return {
     getBankTransactions: async (): Promise<BankTransaction[]> => {
-      const historyTableTransactions = await getTransactions(
+      return await getTransactions(
         driver,
         '#txnHistoryTable thead tr',
         '#txnHistoryTable tbody tr',
       );
-
-      const pendingTableTransactions = await getTransactions(
-        driver,
-        '.transaction-pending table thead tr',
-        '.transaction-pending table tbody tr',
-      );
-
-      return [...historyTableTransactions, ...pendingTableTransactions];
     },
   };
 };

@@ -1,7 +1,6 @@
 import * as moment from 'moment';
 
 import { BankTransaction, ReconcileResult, ReconcileParams } from './types';
-import { config } from './config';
 
 const cleanForCompare = (str: string): string => {
   if (!str) return '';
@@ -19,24 +18,9 @@ const areEqual = (cachedTxn: BankTransaction, bankTxn: BankTransaction) => {
   return isTheSameAmount && isTheSameDesc && isTheSameDay;
 };
 
-const areSimilar = (cachedTxn: BankTransaction, bankTxn: BankTransaction) => {
-  if (!cachedTxn || !bankTxn) {
-    return false;
-  }
-
-  const daysDiff = moment(bankTxn.date).diff(cachedTxn.date, 'days');
-  const isInDateRange = daysDiff > 0 && daysDiff <= config.daysToMatchDuplicateTxns;
-  const cachedDescription = cleanForCompare(cachedTxn.description).substr(0, 10);
-  const bankDescription = cleanForCompare(bankTxn.description).substr(0, 10);
-
-  return cachedTxn.amount === bankTxn.amount && cachedDescription === bankDescription && isInDateRange;
-};
-
 export const reconcile = ({ cachedTransactions, bankTransactions }: ReconcileParams): ReconcileResult => {
   const result = {
     newTxns: [],
-    duplicateTxns: [],
-    matchingTxns: [],
   };
 
   if (!bankTransactions || bankTransactions.length === 0) {
@@ -44,13 +28,10 @@ export const reconcile = ({ cachedTransactions, bankTransactions }: ReconcilePar
   }
 
   var value = bankTransactions.reduce((prev: ReconcileResult, currentTxn: BankTransaction) => {
-    const matching = cachedTransactions.find(cached => areEqual(cached, currentTxn));
-    const duplicate = matching ? null : cachedTransactions.find(cached => areSimilar(cached, currentTxn));
+    const matching = cachedTransactions.find((cached) => areEqual(cached, currentTxn));
 
     return {
-      newTxns: [...prev.newTxns, !matching && !duplicate ? currentTxn : null].filter(Boolean),
-      matchingTxns: [...prev.matchingTxns, matching ? currentTxn : null].filter(Boolean),
-      duplicateTxns: [...prev.duplicateTxns, duplicate ? currentTxn : null].filter(Boolean),
+      newTxns: [...prev.newTxns, !matching ? currentTxn : null].filter(Boolean),
     };
   }, result);
 

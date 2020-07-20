@@ -17,10 +17,9 @@ export const processBankAccount = async (
     const { accountName } = account;
     const accountReader = await bankCrawler.getAccountReader(account);
     const cachedTransactions = await getTransactions(bankId, accountName, username);
-
     const bankTransactions = await accountReader.getBankTransactions();
 
-    const { newTxns, matchingTxns, duplicateTxns } = reconcile({
+    const { newTxns } = reconcile({
       cachedTransactions,
       bankTransactions,
     });
@@ -28,7 +27,6 @@ export const processBankAccount = async (
     logger.info('bankAccountProcessor: Finished Reconciling', {
       newTxnsCount: newTxns.length,
       matchingTxnsCount: newTxns.length,
-      duplicateTxnsCount: duplicateTxns.length,
     });
 
     if (newTxns.length > 0) {
@@ -39,8 +37,6 @@ export const processBankAccount = async (
         bankId,
         accountName,
         newTxns,
-        duplicateTxns,
-        matchingTxns,
       };
       await publish(publisherConfig, message);
     }

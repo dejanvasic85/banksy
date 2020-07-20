@@ -32,7 +32,7 @@ describe('bankAccountProcessor', () => {
   let getBankTransactionsStub: any;
   let publishStub: any;
   let loggerErrorStub: any;
-  let loggerInfoStub;
+  let loggerInfoStub: any;
 
   before(() => {
     bankCrawlerStub = {
@@ -183,8 +183,6 @@ describe('bankAccountProcessor', () => {
         getTransactionsStub.resolves([duplicate]);
         reconcileStub.returns({
           newTxns: [newTxn],
-          duplicateTxns: [duplicate],
-          matchingTxns: [],
         });
 
         await bankAccountProcessor.processBankAccount(username, bankId, account, bankCrawlerStub, publisherConfig);
@@ -198,8 +196,6 @@ describe('bankAccountProcessor', () => {
             bankId: 'bank321',
             username: 'user123',
             newTxns: [newTxn],
-            duplicateTxns: [duplicate],
-            matchingTxns: [],
           },
         ]);
         expect(reconcileStub.getCall(0).args).to.eql([
