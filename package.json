@@ -28,7 +28,7 @@
     "ynab": "^1.18.0"
   },
   "devDependencies": {
-    "@types/chai": "4.2.11",
+    "@types/chai": "4.2.12",
     "@types/mocha": "8.0.0",
     "@types/pg": "7.14.4",
     "@types/selenium-webdriver": "4.0.9",
