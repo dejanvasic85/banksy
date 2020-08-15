@@ -32,6 +32,10 @@ const areSimilar = (cachedTxn: BankTransaction, bankTxn: BankTransaction) => {
   return cachedTxn.amount === bankTxn.amount && cachedDescription === bankDescription && isInDateRange;
 };
 
+const isNotFutureDate = ({ date }: BankTransaction): boolean => {
+  return moment(date).isSameOrBefore(moment());
+};
+
 export const reconcile = ({ cachedTransactions, bankTransactions }: ReconcileParams): ReconcileResult => {
   const result = {
     newTxns: [],
@@ -43,9 +47,9 @@ export const reconcile = ({ cachedTransactions, bankTransactions }: ReconcilePar
     return result;
   }
 
-  var value = bankTransactions.reduce((prev: ReconcileResult, currentTxn: BankTransaction) => {
-    const matching = cachedTransactions.find(cached => areEqual(cached, currentTxn));
-    const duplicate = matching ? null : cachedTransactions.find(cached => areSimilar(cached, currentTxn));
+  var value = bankTransactions.filter(isNotFutureDate).reduce((prev: ReconcileResult, currentTxn: BankTransaction) => {
+    const matching = cachedTransactions.find((cached) => areEqual(cached, currentTxn));
+    const duplicate = matching ? null : cachedTransactions.find((cached) => areSimilar(cached, currentTxn));
 
     return {
       newTxns: [...prev.newTxns, !matching && !duplicate ? currentTxn : null].filter(Boolean),

@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import * as m from 'moment';
 
 import { config } from '../src/config';
 
@@ -209,6 +210,27 @@ describe('reconcile', () => {
           date: bankTxnDate,
         },
       ]);
+    });
+  });
+
+  describe('when the new transaction is a future date', () => {
+    it('should get ignored', () => {
+      const tomorrow = m().add(1, 'day').toISOString(); 
+
+      const txn = {
+        amount: 300,
+        description: 'mcdonalds',
+        date: tomorrow,
+      };
+
+      const cachedTransactions = [];
+      const bankTransactions = [txn];
+
+      const { newTxns, matchingTxns, duplicateTxns } = reconcile({ cachedTransactions, bankTransactions });
+
+      expect(newTxns).to.have.lengthOf(0);
+      expect(matchingTxns).to.have.lengthOf(0);
+      expect(duplicateTxns).to.have.lengthOf(0);
     });
   });
 });
