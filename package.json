@@ -29,10 +29,10 @@
   },
   "devDependencies": {
     "@types/chai": "4.2.12",
-    "@types/mocha": "8.0.2",
+    "@types/mocha": "8.0.3",
     "@types/pg": "7.14.4",
     "@types/selenium-webdriver": "4.0.9",
-    "@types/sinon": "9.0.4",
+    "@types/sinon": "9.0.5",
     "chai": "4.2.0",
     "mocha": "8.1.1",
     "password-prompt": "1.1.2",
