@@ -20,16 +20,26 @@ export const maxxiaCredentialReader = (credentials: string): MaxxiaCredentials =
   };
 };
 
+const getRowData = async (cols: WebElement[]) => {
+  let data: string[] = [];
+  for (const c of cols) {
+    const text = await c.getAttribute('textContent');
+    data.push(text.trim());
+  }
+  return data;
+};
+
 export const maxxiaAccountReader = (driver: WebDriver, account: BankAccount): BankAccountReader => {
   return {
     getBankTransactions: async () => {
       const rows = await driver.findElements(By.css('table > tbody > tr'));
       const txns = await Promise.all(
         rows.map(async (row: WebElement) => {
-          const text = await row.getText();
-          const [dateText, description, accountName, amountText] = text.split('\n');
+          const cols = await row.findElements(By.css('td'));
+          const rowData = await getRowData(cols);
+          const [dateText, description, accountName, amountText] = rowData;
 
-          if (accountName.trim() !== account.accountName) {
+          if (accountName !== account.accountName) {
             return null;
           }
 
@@ -85,6 +95,7 @@ export const maxxiaCrawler = async (credentials: string): Promise<BankAccountCra
       await driver.get(
         'https://securemaxxia.com.au/SecureMaxxia/Transactions.aspx?SelectedBenefitId=1652966&IsSourceDashboard=True',
       );
+
       return maxxiaAccountReader(driver, account);
     },
     quit: async () => {

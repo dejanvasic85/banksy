@@ -5,11 +5,12 @@
   "main": "handler.js",
   "scripts": {
     "test": "mocha -r ts-node/register ./test/*-spec.ts",
-    "test:integration": "mocha -r ts-node/register ./integration-tests/banks.ts --timeout 60000",
+    "test:integration": "mocha -r ts-node/register ./integration-tests/maxxia.ts --timeout 60000",
     "test:single": "mocha -r ts-node/register ./test/$test*-spec.ts --watch-extensions ts --w",
     "start": "ts-node ./src/index.ts",
     "build": "tsc",
     "credentials": "ts-node ./src/generateCredentials.ts",
+    "credentials:decrypt": "ts-node ./src/decryptCredentials.ts",
     "migrate": "ts-node ./integration-tests/migrate.ts"
   },
   "keywords": [],
