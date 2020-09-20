@@ -39,6 +39,6 @@
     "password-prompt": "1.1.2",
     "sinon": "9.0.3",
     "ts-node": "9.0.0",
-    "typescript": "4.0.2"
+    "typescript": "4.0.3"
   }
 }
