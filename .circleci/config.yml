@@ -3,7 +3,7 @@ jobs:
   build: 
     working_directory: ~/banksy # directory where steps will run
     docker: # run the steps with Docker
-      - image: circleci/node:12.20.0 
+      - image: circleci/node:12.20.1 
       # - image: mongo:4.2.0 # and this image as the secondary service container
     steps: 
       - checkout
