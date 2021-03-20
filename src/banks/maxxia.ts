@@ -70,9 +70,14 @@ export const maxxiaCrawler = async (credentials: string): Promise<BankAccountCra
       // Sometimes a little dialog appears after 2 seconds. Check if that is the case and close it first
       await pause(3000);
 
-      const closeBtn = await driver.findElements(By.css('.norfolk-ClosePosition--top-right > svg'));
-      if (closeBtn.length > 0) {
-        await closeBtn[0].click();
+      const closeButton = await driver.findElements(By.css('.norfolk-ClosePosition--top-right > svg'));
+      if (closeButton.length > 0) {
+        await closeButton[0].click();
+      }
+
+      const altCloseButton = await driver.findElements(By.css('.pomaria-CloseButton'));
+      if (altCloseButton.length > 0) {
+        await altCloseButton[0].click();
       }
 
       await driver
