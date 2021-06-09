@@ -18,7 +18,7 @@
   "license": "ISC",
   "dependencies": {
     "aws-sdk": "^2.573.0",
-    "chromedriver": "^88.0.0",
+    "chromedriver": "^91.0.0",
     "cryptr": "^6.0.1",
     "dotenv": "^8.2.0",
     "moment": "^2.24.0",
